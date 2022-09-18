@@ -47,7 +47,7 @@ qoi_list = list(qoi_units_map.keys())
 qoi_units = list(qoi_units_map.values())
 
 qoi_plot_map = {'UMAG': 'm/s',
-                #'TKE' : 'm2/s2',
+                'TKE' : 'm2/s2',
                 'W'   : 'm/s'
                }
 
@@ -66,10 +66,15 @@ with open(os.path.join(proc_data_loc, pickle_file), 'wb') as pickle_file_handle:
     pickle.dump(pickled_data, pickle_file_handle)
 #'''    
 # In[]
-'''
+#'''
 pickle_file = 'pickled_2010-05-16_00:00:00.pkl'
 plot_contours_instantaneous(os.path.join(proc_data_loc, pickle_file), proc_data_loc, qoi_plot_map)
-'''
+#'''
+# In[]
+#'''
+pickle_file = 'pickled_2010-05-16_00:00:00.pkl'
+plot_contours_time_avg(os.path.join(proc_data_loc, pickle_file), proc_data_loc, {'UMAG': 'm/s', 'W_AVG'   : 'm/s'})
+#'''
 
 # In[]
 # Loop over QoI of interest to create plots
