@@ -27,7 +27,7 @@ plt.style.use('seaborn-white')
 netCDF_file_loc = '/Users/jha3/Downloads/tsout_d06_2010-05-16_00:00:10'
 wrf_domain6 = xr.open_dataset(netCDF_file_loc)
 
-plot_loc = '/Users/jha3/Downloads/plots'
+proc_data_loc = '/Users/jha3/Downloads/proc_data'
 
 # In[]:
 # reference time (based on NetCDF file name) and sampling time interval
@@ -46,18 +46,28 @@ qoi_list = list(qoi_units_map.keys())
 #qoi_list = ['UTS']
 qoi_units = list(qoi_units_map.values())
 
+qoi_plot_map = {'UMAG': 'm/s',
+                #'TKE' : 'm2/s2',
+                'W'   : 'm/s'
+               }
+
 z_plane_locs = [20, 25]
 
 vert_line_locs = [1] #D
 
 frac_time = 0.05 # Fraction of tiem series to use
 
+'''
 # In[]
 pickled_data, pickle_file = create_instantaneous_data (wrf_domain6, qoi_units_map, z_plane_locs, vert_line_locs, ref_time, dt, frac_time)
 #create_instantaneous_data (wrf_domain6, qoi_units_map, z_plane_locs, vert_line_locs, ref_time, dt, frac_time)
 
-with open(os.path.join(plot_loc, pickle_file), 'wb') as pickle_file_handle:
+with open(os.path.join(proc_data_loc, pickle_file), 'wb') as pickle_file_handle:
     pickle.dump(pickled_data, pickle_file_handle)
+'''    
+# In[]
+pickle_file = 'pickled_2010-05-16_00:00:00.pkl'
+plot_contours_instantaneous(os.path.join(proc_data_loc, pickle_file), proc_data_loc, qoi_plot_map)
 
 # In[]
 # Loop over QoI of interest to create plots

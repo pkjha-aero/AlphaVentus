@@ -13,6 +13,64 @@ from matplotlib import pyplot as plt
 from matplotlib import gridspec
 import json
 from datetime import date, datetime, timedelta, time
+import pickle
+
+# In[]
+def plot_contours_instantaneous(pickle_file_name, plot_loc, qoi_plot_map):
+    # In[] Read the pickle data
+    with open(pickle_file_name, 'rb') as pickle_file_handle:
+        pickled_data_read = pickle.load(pickle_file_handle)
+    
+    # In[] Data from 
+    start_time_stamp = pickled_data_read['start_time_stamp']
+    DX = pickled_data_read['DX']
+    DY = pickled_data_read['DX']
+    n_time_stamps = pickled_data_read['n_time_stamps']
+    n_zloc = pickled_data_read['n_zloc']
+    n_axial_loc = pickled_data_read['n_axial_loc']
+    
+    z_slices_instantaneous = pickled_data_read['z_slices_instantaneous']
+    
+    # In[]
+    cmap_name = 'rainbow'
+    
+    qoi = 'UMAG'
+    qoi_unit = 'm/s'
+    # In[] Loop over time stamps
+    for time_count, time_stamp in enumerate(z_slices_instantaneous.keys()):
+        current_time_stamp = time_stamp.split('_')[1]
+    
+        for space_count, zloc in enumerate(z_slices_instantaneous[time_stamp]) :
+            z_slice_space = z_slices_instantaneous[time_stamp][zloc]
+            space = z_slice_space[qoi]
+            nx = int(round(np.shape(space)[0],-2))
+            ny = int(round(np.shape(space)[1],-2))
+            ratio = ny/nx
+            z = z_slice_space['z']
+            #print(ratio)
+            
+            plt.figure()
+            plane_cols, plane_rows = np.meshgrid(range(space.shape[1]), range(space.shape[0]))
+            cont = plt.contourf(plane_cols*DX,plane_rows*DY, space, 20, cmap=cmap_name)
+            clb = plt.colorbar(cont)
+            clb.ax.set_title(f"%s [%s]"%(qoi, qoi_unit), weight='bold')
+            #plt.set_figheight(4.5*nTime)#figsize = (4.5*nTime)
+            #plt.set_figwidth(5*nSpace*ratio)
+            plt.xlabel(f"%s [m]"%'west_east', fontsize=14)
+            plt.ylabel(f"%s [m]"%'south_north', fontsize=14)
+            plt.tick_params(axis='x', labelsize=14)
+            plt.tick_params(axis='y', labelsize=14)
+            plt.title(f"%s, z = %.2f m" %(current_time_stamp, z), fontsize=14)
+            plt.xlim([250*DX,350*DX])
+            plt.ylim([250*DY,350*DY])
+            plt.tight_layout() 
+    
+    
+            filename = "z_slice_%s_%s_%s_%s"%(qoi, current_time_stamp, 'bottom_top', str(zloc))
+            filedir = os.path.join(plot_loc, 'Instantaneous', qoi, 'bottom_top_' + str(zloc))
+            os.system('mkdir -p %s'%filedir)
+            plt.savefig(os.path.join(plot_loc, 'Instantaneous', qoi, 'bottom_top_' + str(zloc), filename), bbox_inches='tight')
+    
 
 # In[]:
 # Plot Contours at selected time and space locations

@@ -51,7 +51,7 @@ def get_z_slices_instantaneous(nc_data, qoi_units_map, z_plane_locs, ref_time, d
     
     z_slice_data = {}
     
-    # In[] Read all the relevant data from the 
+    # In[] Read all the relevant data from the NetCDF file
     for qoi in qoi_units_map.keys():
         qoi_data = nc_data[qoi]
         if qoi == 'WTS' or qoi == 'ZTS':
@@ -106,25 +106,29 @@ def get_z_slices_instantaneous(nc_data, qoi_units_map, z_plane_locs, ref_time, d
 def create_instantaneous_data (nc_data, qoi_units_map, z_plane_locs, vert_line_locs, ref_time, dt, frac_time):
     pickled_data = {}
     
-    # Start time stamp to identify the beginning of a data set 
+    # In[] Start time stamp to identify the beginning of a data set 
     start_time = datetime.fromisoformat(ref_time[2]+ '_' + ref_time[3]) - timedelta(seconds = dt)
     start_time_stamp = start_time.isoformat('_') #.split('_')[1]
     pickled_data['start_time_stamp'] = start_time_stamp
     pickle_filename = f"pickled_%s.pkl"%start_time_stamp
     
+    # In[]
     # Extract grid resolution
     DX = nc_data.DX
     DY = nc_data.DY
     pickled_data.update({'DX': DX, 'DY': DY})
     
+    # In[]
     # Find number of time stamps, z-locations, and axial locations for sampling
     n_time_stamps = nc_data.dims['Time']
     n_zloc        = np.size(z_plane_locs)
     n_axial_loc   = np.size(vert_line_locs)
     pickled_data.update({'n_time_stamps': n_time_stamps, 'n_zloc': n_zloc, 'n_axial_loc': n_axial_loc})
     
+    # In[]
     pickled_data['z_slices_instantaneous'] = get_z_slices_instantaneous(nc_data, qoi_units_map, z_plane_locs, ref_time, dt, start_time, frac_time)
     
+    # In[]
     return pickled_data, pickle_filename
     
     
