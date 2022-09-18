@@ -51,6 +51,13 @@ def get_z_slices_instantaneous(nc_data, qoi_units_map, z_plane_locs, ref_time, d
     
     z_slice_data = {}
     
+    # In[]
+    # In[]
+    qoi_list = ['UTS', 'VTS', 'WTS']
+    #qoi_list = ['UTS']
+    z_slices_time_avg = get_z_slices_time_averaged(nc_data, qoi_list, z_plane_locs, ref_time, dt, start_time, frac_time)
+   
+    
     # In[] Read all the relevant data from the NetCDF file
     for qoi in qoi_units_map.keys():
         qoi_data = nc_data[qoi]
@@ -92,18 +99,72 @@ def get_z_slices_instantaneous(nc_data, qoi_units_map, z_plane_locs, ref_time, d
             z1 = nc_data['ZTS'].isel(south_north = 300).isel(west_east = 300).isel(Time = time_count).isel(bottom_top_stag = z_plane_locs[space_count])
             z2 = nc_data['ZTS'].isel(south_north = 300).isel(west_east = 300).isel(Time = time_count).isel(bottom_top_stag = z_plane_locs[space_count] + 1)
             z_slice_space['z'] = 0.5*np.float((z1 + z2))
+            z_slice_space['U'] = z_slice_data['UTS'][time_count][space_count]
+            z_slice_space['V'] = z_slice_data['VTS'][time_count][space_count]
             z_slice_space['W'] = z_slice_data['WTS'][time_count][space_count]
             z_slice_space['UMAG'] = z_slice_data['UMAG'][time_count][space_count]
-
+            
+            z_slice_space['UP'] = z_slice_space['U'] - z_slices_time_avg[start_time.isoformat('_')][z_plane_locs[space_count]]['U_AVG']
+            z_slice_space['VP'] = z_slice_space['V'] - z_slices_time_avg[start_time.isoformat('_')][z_plane_locs[space_count]]['V_AVG']
+            z_slice_space['WP'] = z_slice_space['W'] - z_slices_time_avg[start_time.isoformat('_')][z_plane_locs[space_count]]['W_AVG']
+            z_slice_space['TKE'] = 0.5*(np.square(z_slice_space['UP']) + np.square(z_slice_space['VP']) + np.square(z_slice_space['WP']))
+            
             z_slice_time[z_plane_locs[space_count]] = z_slice_space
         
         z_slices_instantaneous[current_time_stamp] = z_slice_time
             
     # In[]    
-    return z_slices_instantaneous
+    return z_slices_instantaneous, z_slices_time_avg
 
 # In[]
-def create_instantaneous_data (nc_data, qoi_units_map, z_plane_locs, vert_line_locs, ref_time, dt, frac_time):
+def get_z_slices_time_averaged(nc_data, qoi_list, z_plane_locs, ref_time, dt, start_time, frac_time):
+    z_slices_time_averaged = {}
+    
+    n_time_stamps = nc_data.dims['Time']
+    n_zloc        = np.size(z_plane_locs)
+    
+    z_slice_data = {}
+    time_count = 0
+    
+    # In[] Read all the relevant data from the NetCDF file
+    for qoi in qoi_list:
+        qoi_data = nc_data[qoi]
+        if qoi == 'WTS' or qoi == 'ZTS':
+            bottom_top_dim = 'bottom_top_stag'
+        else:
+            bottom_top_dim = 'bottom_top'
+        
+        z_slice_data[qoi] = []
+        z_slice_avg = []
+        for space_count in range(n_zloc):
+            slice_loc = '{"%s" : %d}'%(bottom_top_dim, z_plane_locs[space_count])
+            slice_loc_dict = json.loads(slice_loc)
+            arr = qoi_data.isel(slice_loc_dict).mean(dim = 'Time')
+            z_slice_avg.append(np.array(arr))
+        z_slice_data[qoi].append(z_slice_avg)
+        
+    # In[] Rearrange data in dict format
+    current_time_stamp = start_time.isoformat('_')
+    z_slice_time = {}
+    
+    for space_count in range(n_zloc):
+        z_slice_space = {}
+        z1 = nc_data['ZTS'].isel(south_north = 300).isel(west_east = 300).isel(Time = time_count).isel(bottom_top_stag = z_plane_locs[space_count])
+        z2 = nc_data['ZTS'].isel(south_north = 300).isel(west_east = 300).isel(Time = time_count).isel(bottom_top_stag = z_plane_locs[space_count] + 1)
+        z_slice_space['z'] = 0.5*np.float((z1 + z2))
+        z_slice_space['U_AVG'] = z_slice_data['UTS'][time_count][space_count]
+        z_slice_space['V_AVG'] = z_slice_data['VTS'][time_count][space_count]
+        z_slice_space['W_AVG'] = z_slice_data['WTS'][time_count][space_count]
+
+        z_slice_time[z_plane_locs[space_count]] = z_slice_space
+    
+    z_slices_time_averaged[current_time_stamp] = z_slice_time
+            
+    # In[]    
+    return z_slices_time_averaged
+
+# In[]
+def create_data (nc_data, qoi_units_map, z_plane_locs, vert_line_locs, ref_time, dt, frac_time):
     pickled_data = {}
     
     # In[] Start time stamp to identify the beginning of a data set 
@@ -126,7 +187,7 @@ def create_instantaneous_data (nc_data, qoi_units_map, z_plane_locs, vert_line_l
     pickled_data.update({'n_time_stamps': n_time_stamps, 'n_zloc': n_zloc, 'n_axial_loc': n_axial_loc})
     
     # In[]
-    pickled_data['z_slices_instantaneous'] = get_z_slices_instantaneous(nc_data, qoi_units_map, z_plane_locs, ref_time, dt, start_time, frac_time)
+    pickled_data['z_slices_instantaneous'], pickled_data['z_slices_time_avg'] = get_z_slices_instantaneous(nc_data, qoi_units_map, z_plane_locs, ref_time, dt, start_time, frac_time)
     
     # In[]
     return pickled_data, pickle_filename

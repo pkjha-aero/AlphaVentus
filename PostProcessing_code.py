@@ -51,23 +51,25 @@ qoi_plot_map = {'UMAG': 'm/s',
                 'W'   : 'm/s'
                }
 
-z_plane_locs = [20, 25]
+z_plane_locs = [20]
 
 vert_line_locs = [1] #D
 
-frac_time = 0.05 # Fraction of tiem series to use
+frac_time = 1.00 #0.03 # Fraction of time series to use
 
-'''
 # In[]
-pickled_data, pickle_file = create_instantaneous_data (wrf_domain6, qoi_units_map, z_plane_locs, vert_line_locs, ref_time, dt, frac_time)
+#'''
+pickled_data, pickle_file = create_data (wrf_domain6, qoi_units_map, z_plane_locs, vert_line_locs, ref_time, dt, frac_time)
 #create_instantaneous_data (wrf_domain6, qoi_units_map, z_plane_locs, vert_line_locs, ref_time, dt, frac_time)
 
 with open(os.path.join(proc_data_loc, pickle_file), 'wb') as pickle_file_handle:
     pickle.dump(pickled_data, pickle_file_handle)
-'''    
+#'''    
 # In[]
+'''
 pickle_file = 'pickled_2010-05-16_00:00:00.pkl'
 plot_contours_instantaneous(os.path.join(proc_data_loc, pickle_file), proc_data_loc, qoi_plot_map)
+'''
 
 # In[]
 # Loop over QoI of interest to create plots
