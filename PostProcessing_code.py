@@ -66,13 +66,16 @@ dt = 10 # sec
 
 plane = ['xy','yz','xz']
 qoi_list = ['UTS', 'TKETS', 'T12TS']
+#qoi_list = ['UTS']
 qoi_units = ['m/s', 'm2/s2', 'm2/s2']
 
 plot_loc = '/Users/jha3/Downloads/plots'
 
 for (qoi, qoi_unit) in zip(qoi_list, qoi_units):
     qoi_data, qoi_dim_names, qoi_dim = getQoI(wrf_domain6, qoi)
+
         
+    '''
     # Plot contours at the desired times and spatial locations
     slt = sampling_loc_time(qoi_dim_names, qoi_dim)
     for plane_ind in range(0,1):
@@ -87,4 +90,20 @@ for (qoi, qoi_unit) in zip(qoi_list, qoi_units):
             plane_cols, plane_rows = np.meshgrid(wrf_domain6[qoi_dim_names[3]], wrf_domain6[qoi_dim_names[1]])
             contourPlotSpaceTime(wrf_domain6, qoi_data, qoi, qoi_unit, qoi_dim_names[2],slt,plane_rows, plane_cols, pl, plot_loc, ref_time, dt)
     
-
+    '''
+    '''
+    pl = 'xy'
+    vert_loc = [20, 25]
+    plane_cols, plane_rows = np.meshgrid(wrf_domain6[qoi_dim_names[3]], wrf_domain6[qoi_dim_names[2]])
+    contourPlotInstantaneous(wrf_domain6, qoi_data, qoi, qoi_unit, qoi_dim_names[1], vert_loc, plane_rows, plane_cols, pl, plot_loc, ref_time, dt)
+    '''
+    '''
+    pl = 'xy'
+    vert_loc = [20]
+    plane_cols, plane_rows = np.meshgrid(wrf_domain6[qoi_dim_names[3]], wrf_domain6[qoi_dim_names[2]])
+    contourPlotTimeAvg(wrf_domain6, qoi_data, qoi, qoi_unit, qoi_dim_names[1], vert_loc, plane_rows, plane_cols, pl, plot_loc, ref_time, dt)
+    '''
+    [we_ind, sn_ind] = [300, 300]
+    linePlotTimeAvg(wrf_domain6, qoi_data, qoi, qoi_unit, we_ind, sn_ind, plot_loc, ref_time, dt)
+    
+    dummy = 0

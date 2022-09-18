@@ -152,3 +152,135 @@ def contourPlotSpaceTime(nc_data, qoi_data, qoi, qoi_unit, plane_header, slt, pl
     filename = "%s_plane_%s"%(pl, qoi)
     plt.savefig(os.path.join(plot_loc, filename), bbox_inches='tight')       
             
+    
+# In[]
+def contourPlotInstantaneous(nc_data, qoi_data, qoi, qoi_unit, plane_header, vert_loc, plane_rows, plane_cols, pl, plot_loc, ref_time, dt):   
+    DX = nc_data.DX
+    DY = nc_data.DY
+    
+    start_time = datetime.fromisoformat(ref_time[2]+ '_' + ref_time[3]) - timedelta(seconds = dt)
+   
+    nSpace = np.size(vert_loc)    
+    nTime = nc_data.dims['Time']
+   
+    qoi_time = []
+    for time_count in range(int(nTime)):
+        qoi_space = []
+        for space_count in range(nSpace):
+            slice_loc = '{"%s" : %d}'%(plane_header, vert_loc[space_count])
+            slice_loc_dict = json.loads(slice_loc)
+            arr = qoi_data.isel(Time=time_count).isel(slice_loc_dict)
+            axes_name = arr.dims
+            qoi_space.append(np.array(arr))
+                    
+        qoi_time.append(qoi_space)
+       
+    #print('qoi_time ', qoi_time)
+    
+    cmap_name = 'rainbow'
+     
+    for time_count in range(int(nTime)):
+        time_inst_space = qoi_time[time_count]
+        current_time = start_time + timedelta(seconds = time_count*dt)
+        current_time_stamp = current_time.isoformat('_').split('_')[1]
+
+        for space_count in range(nSpace):
+            space = time_inst_space[space_count]
+            nx = int(round(np.shape(space)[0],-2))
+            ny = int(round(np.shape(space)[1],-2))
+            ratio = ny/nx
+            z1 = nc_data['ZTS'].isel(south_north = 300).isel(west_east = 300).isel(Time = time_count).isel(bottom_top_stag = vert_loc[space_count])
+            z2 = nc_data['ZTS'].isel(south_north = 300).isel(west_east = 300).isel(Time = time_count).isel(bottom_top_stag = vert_loc[space_count] + 1)
+            z = 0.5*(z1 + z2) 
+            #print(ratio)
+            
+            plt.figure()
+            cont = plt.contourf(plane_cols*DX,plane_rows*DY, space, 20, cmap=cmap_name)
+            clb = plt.colorbar(cont)
+            clb.ax.set_title(f"%s [%s]"%(qoi, qoi_unit), weight='bold')
+            #plt.set_figheight(4.5*nTime)#figsize = (4.5*nTime)
+            #plt.set_figwidth(5*nSpace*ratio)
+            plt.xlabel(f"%s [m]"%axes_name[1], fontsize=14)
+            plt.ylabel(f"%s [m]"%axes_name[0], fontsize=14)
+            plt.tick_params(axis='x', labelsize=14)
+            plt.tick_params(axis='y', labelsize=14)
+            plt.title(f"%s, z = %.2f m" %(current_time_stamp, z), fontsize=14)
+            plt.xlim([250*DX,350*DX])
+            plt.ylim([250*DY,350*DY])
+            plt.tight_layout() 
+   
+    
+            filename = "%s_plane_%s_%s_%s_%s"%(pl, qoi, current_time_stamp, plane_header, str(vert_loc[space_count]))
+            plt.savefig(os.path.join(plot_loc, filename), bbox_inches='tight')       
+            
+# In[]
+def contourPlotTimeAvg(nc_data, qoi_data, qoi, qoi_unit, plane_header, vert_loc, plane_rows, plane_cols, pl, plot_loc, ref_time, dt):   
+    DX = nc_data.DX
+    DY = nc_data.DY
+    
+    start_time = datetime.fromisoformat(ref_time[2]+ '_' + ref_time[3]) - timedelta(seconds = dt)
+    start_time_stamp = start_time.isoformat('_').split('_')[1]
+    
+    nSpace = np.size(vert_loc)
+    
+    cmap_name = 'rainbow'
+
+    time_count = 0
+    for space_count in range(nSpace):
+        space = qoi_data.isel(bottom_top = vert_loc[space_count]).mean(dim = 'Time')
+        axes_name = space.dims
+        nx = int(round(np.shape(space)[0],-2))
+        ny = int(round(np.shape(space)[1],-2))
+        ratio = ny/nx
+        z1 = nc_data['ZTS'].isel(south_north = 300).isel(west_east = 300).isel(Time = time_count).isel(bottom_top_stag = vert_loc[space_count])
+        z2 = nc_data['ZTS'].isel(south_north = 300).isel(west_east = 300).isel(Time = time_count).isel(bottom_top_stag = vert_loc[space_count] + 1)
+        z = 0.5*(z1 + z2) 
+        #print(ratio)
+        
+        plt.figure()
+        cont = plt.contourf(plane_cols*DX,plane_rows*DY, space, 20, cmap=cmap_name)
+        clb = plt.colorbar(cont)
+        clb.ax.set_title(f"%s [%s]"%(qoi, qoi_unit), weight='bold')
+        #plt.set_figheight(4.5*nTime)#figsize = (4.5*nTime)
+        #plt.set_figwidth(5*nSpace*ratio)
+        plt.xlabel(f"%s [m]"%axes_name[1], fontsize=14)
+        plt.ylabel(f"%s [m]"%axes_name[0], fontsize=14)
+        plt.tick_params(axis='x', labelsize=14)
+        plt.tick_params(axis='y', labelsize=14)
+        plt.title(f"time avg start = %s, z = %.2f m" %(start_time_stamp, z), fontsize=14)
+        plt.xlim([250*DX,350*DX])
+        plt.ylim([250*DY,350*DY])
+        plt.tight_layout() 
+   
+
+        filename = "%s_plane_%s_time_avg_start_%s_%s_%s"%(pl, qoi, start_time_stamp, plane_header, str(vert_loc[space_count]))
+        plt.savefig(os.path.join(plot_loc, filename), bbox_inches='tight') 
+        
+ 
+# In[]
+def linePlotTimeAvg(nc_data, qoi_data, qoi, qoi_unit, we_ind, sn_ind, plot_loc, ref_time, dt):
+    start_time = datetime.fromisoformat(ref_time[2]+ '_' + ref_time[3]) - timedelta(seconds = dt)
+    start_time_stamp = start_time.isoformat('_').split('_')[1]
+    
+    time_count = 0
+    z_stag = nc_data['ZTS'].isel(south_north = sn_ind).isel(west_east = we_ind).isel(Time = time_count)
+    z = 0.5*(z_stag[1:] + z_stag[:-1])
+    
+    line_var = qoi_data.isel(south_north = sn_ind).isel(west_east = we_ind).mean(dim = 'Time')
+    
+    plt.figure()
+    plt.plot(line_var, z)
+    plt.xlabel(f"%s [%s]"%(qoi, qoi_unit), fontsize=14)
+    plt.ylabel(f"Height [m]"%z, fontsize=14)
+    plt.tick_params(axis='x', labelsize=14)
+    plt.tick_params(axis='y', labelsize=14)
+    plt.title(f"time avg start = %s, we = %d, sn = %d m" %(start_time_stamp, we_ind, sn_ind), fontsize=14)
+    #plt.xlim([250*DX,350*DX])
+    plt.ylim([0, 150])
+    plt.tight_layout() 
+
+
+    filename = "vertline_%s_we_%s_sn_%s_time_avg_start_%s"%(qoi, str(we_ind), str(sn_ind),  start_time_stamp)
+    plt.savefig(os.path.join(plot_loc, filename), bbox_inches='tight')
+    
+    
