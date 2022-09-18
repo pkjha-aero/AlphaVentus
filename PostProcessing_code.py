@@ -3,8 +3,8 @@
 
 # In[]:
 # Import Modules
-#from data_processing import *
-#from plotting import *
+from data_processing import *
+from plotting import *
 
 import os
 import sys
@@ -33,15 +33,31 @@ plot_loc = '/Users/jha3/Downloads/plots'
 # reference time (based on NetCDF file name) and sampling time interval
 ref_time = netCDF_file_loc.split('_')
 dt = 10 # sec
-pickle_file_name = 'pickle_' + ref_time[2] + '_' + ref_time[3]
 
 # In[]:
 # Variables of interest
 plane = ['xy','yz','xz']
 
-qoi_list = ['UTS', 'TKETS', 'T12TS']
+qoi_units_map = {'UTS': 'm/s',
+                 'VTS': 'm/s',
+                 'WTS': 'm/s'
+                }
+qoi_list = list(qoi_units_map.keys())
 #qoi_list = ['UTS']
-qoi_units = ['m/s', 'm2/s2', 'm2/s2']
+qoi_units = list(qoi_units_map.values())
+
+z_plane_locs = [20, 25]
+
+vert_line_locs = [1] #D
+
+frac_time = 0.05 # Fraction of tiem series to use
+
+# In[]
+pickled_data, pickle_file = create_instantaneous_data (wrf_domain6, qoi_units_map, z_plane_locs, vert_line_locs, ref_time, dt, frac_time)
+#create_instantaneous_data (wrf_domain6, qoi_units_map, z_plane_locs, vert_line_locs, ref_time, dt, frac_time)
+
+with open(os.path.join(plot_loc, pickle_file), 'wb') as pickle_file_handle:
+    pickle.dump(pickled_data, pickle_file_handle)
 
 # In[]
 # Loop over QoI of interest to create plots
@@ -81,9 +97,13 @@ for (qoi, qoi_unit) in zip(qoi_list, qoi_units):
     contourPlotTimeAvg(wrf_domain6, qoi_data, qoi, qoi_unit, qoi_dim_names[1], vert_loc, plane_rows, plane_cols, pl, plot_loc, ref_time, dt)
     '''
     
-    # In[]  
+    # In[]
+    '''
     [we_ind, sn_ind] = [300, 300]
     linePlotTimeAvg(wrf_domain6, qoi_data, qoi, qoi_unit, we_ind, sn_ind, plot_loc, ref_time, dt)
+    '''
+    
+    # In[]
     
     # In[]  
     dummy = 0
