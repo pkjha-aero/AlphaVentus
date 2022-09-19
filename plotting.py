@@ -85,7 +85,6 @@ def plot_contours_time_avg(pickle_file_name, plot_loc, qoi_plot_map):
     n_zloc = pickled_data_read['n_zloc']
     n_axial_loc = pickled_data_read['n_axial_loc']
     
-    z_slices_instantaneous = pickled_data_read['z_slices_instantaneous']
     z_slices_time_avg = pickled_data_read['z_slices_time_avg']
     
     # In[]
@@ -95,84 +94,40 @@ def plot_contours_time_avg(pickle_file_name, plot_loc, qoi_plot_map):
     for qoi in qoi_plot_map:
         qoi_unit = qoi_plot_map[qoi]
         
-        if qoi == 'W_AVG':
-            time_stamp = list(z_slices_time_avg.keys())[0]
-            current_time_stamp = time_stamp.split('_')[1]
-        
-            for space_count, zloc in enumerate(z_slices_time_avg[time_stamp]) :
-                z_slice_space = z_slices_time_avg[time_stamp][zloc]
-                space = z_slice_space[qoi]
-                nx = int(round(np.shape(space)[0],-2))
-                ny = int(round(np.shape(space)[1],-2))
-                ratio = ny/nx
-                z = z_slice_space['z']
-                #print(ratio)
+        time_stamp = list(z_slices_time_avg.keys())[0]
+        current_time_stamp = time_stamp.split('_')[1]
+    
+        for space_count, zloc in enumerate(z_slices_time_avg[time_stamp]) :
+            z_slice_space = z_slices_time_avg[time_stamp][zloc]
+            space = z_slice_space[qoi]
+            nx = int(round(np.shape(space)[0],-2))
+            ny = int(round(np.shape(space)[1],-2))
+            ratio = ny/nx
+            z = z_slice_space['z']
+            #print(ratio)
+            
+            plt.figure()
+            plane_cols, plane_rows = np.meshgrid(range(space.shape[1]), range(space.shape[0]))
+            cont = plt.contourf(plane_cols*DX,plane_rows*DY, space, 20, cmap=cmap_name)
+            clb = plt.colorbar(cont)
+            clb.ax.set_title(f"%s [%s]"%(qoi, qoi_unit), weight='bold')
+            #plt.set_figheight(4.5*nTime)#figsize = (4.5*nTime)
+            #plt.set_figwidth(5*nSpace*ratio)
+            plt.xlabel(f"%s [m]"%'west_east', fontsize=14)
+            plt.ylabel(f"%s [m]"%'south_north', fontsize=14)
+            plt.tick_params(axis='x', labelsize=14)
+            plt.tick_params(axis='y', labelsize=14)
+            plt.title(f"%s, z = %.2f m" %(current_time_stamp, z), fontsize=14)
+            plt.xlim([250*DX,350*DX])
+            plt.ylim([250*DY,350*DY])
+            plt.tight_layout() 
+    
+    
+            filename = "z_slice_%s_%s_%s_%s"%(qoi, current_time_stamp, 'bottom_top', str(zloc))
+            filedir = os.path.join(plot_loc, 'TimeAvg', qoi, 'bottom_top_' + str(zloc))
+            os.system('mkdir -p %s'%filedir)
+            plt.savefig(os.path.join(filedir, filename), bbox_inches='tight')
                 
-                plt.figure()
-                plane_cols, plane_rows = np.meshgrid(range(space.shape[1]), range(space.shape[0]))
-                cont = plt.contourf(plane_cols*DX,plane_rows*DY, space, 20, cmap=cmap_name)
-                clb = plt.colorbar(cont)
-                clb.ax.set_title(f"%s [%s]"%(qoi, qoi_unit), weight='bold')
-                #plt.set_figheight(4.5*nTime)#figsize = (4.5*nTime)
-                #plt.set_figwidth(5*nSpace*ratio)
-                plt.xlabel(f"%s [m]"%'west_east', fontsize=14)
-                plt.ylabel(f"%s [m]"%'south_north', fontsize=14)
-                plt.tick_params(axis='x', labelsize=14)
-                plt.tick_params(axis='y', labelsize=14)
-                plt.title(f"%s, z = %.2f m" %(current_time_stamp, z), fontsize=14)
-                plt.xlim([250*DX,350*DX])
-                plt.ylim([250*DY,350*DY])
-                plt.tight_layout() 
-        
-        
-                filename = "z_slice_%s_%s_%s_%s"%(qoi, current_time_stamp, 'bottom_top', str(zloc))
-                filedir = os.path.join(plot_loc, 'TimeAvg', qoi, 'bottom_top_' + str(zloc))
-                os.system('mkdir -p %s'%filedir)
-                plt.savefig(os.path.join(filedir, filename), bbox_inches='tight')
-                
-        elif qoi == 'UMAG':
-            space_avg = {}
-            for time_count, time_stamp in enumerate(z_slices_instantaneous.keys()):
-                current_time_stamp = time_stamp.split('_')[1]
-            
-                for space_count, zloc in enumerate(z_slices_instantaneous[time_stamp]):
-                    z_slice_space = z_slices_instantaneous[time_stamp][zloc]
-                    space = z_slice_space[qoi]
-                    if time_count == 0:
-                        space_avg[zloc] = space
-                    else:
-                        space_avg[zloc] += space
-                    nx = int(round(np.shape(space)[0],-2))
-                    ny = int(round(np.shape(space)[1],-2))
-                    ratio = ny/nx
-                    z = z_slice_space['z']
-                    #print(ratio)
-             
-            for space_count, zloc in enumerate(space_avg.keys()):
-                space = space_avg[zloc]/n_time_stamps
-                plt.figure()
-                plane_cols, plane_rows = np.meshgrid(range(space.shape[1]), range(space.shape[0]))
-                cont = plt.contourf(plane_cols*DX,plane_rows*DY, space, 20, cmap=cmap_name)
-                clb = plt.colorbar(cont)
-                clb.ax.set_title(f"%s [%s]"%(qoi, qoi_unit), weight='bold')
-                #plt.set_figheight(4.5*nTime)#figsize = (4.5*nTime)
-                #plt.set_figwidth(5*nSpace*ratio)
-                plt.xlabel(f"%s [m]"%'west_east', fontsize=14)
-                plt.ylabel(f"%s [m]"%'south_north', fontsize=14)
-                plt.tick_params(axis='x', labelsize=14)
-                plt.tick_params(axis='y', labelsize=14)
-                plt.title(f"%s, z = %.2f m" %(current_time_stamp, z), fontsize=14)
-                plt.xlim([250*DX,350*DX])
-                plt.ylim([250*DY,350*DY])
-                plt.tight_layout() 
-        
-        
-                filename = "z_slice_%s_%s_%s_%s"%(qoi, current_time_stamp, 'bottom_top', str(zloc))
-                filedir = os.path.join(plot_loc, 'TimeAvg', qoi, 'bottom_top_' + str(zloc))
-                os.system('mkdir -p %s'%filedir)
-                plt.savefig(os.path.join(filedir, filename), bbox_inches='tight')
-            
-            
 
 # In[]:
 # Plot Contours at selected time and space locations

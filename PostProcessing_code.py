@@ -18,12 +18,12 @@ from matplotlib import pyplot as plt
 from matplotlib import gridspec
 import json
 import pickle
+from datetime import date, datetime, timedelta, time
+
 plt.style.use('seaborn-white')
 
 # In[]
 # Load NetCDF file containing tsout data and define plot location
-#scratch_folder_loc = '/p/lustre2/nainap/'
-#netCDF_file_loc = os.path.join(scratch_folder_loc,'From_Pankaj', 'NetCDF_files','wrfout_GAD_FINO_SecondResult' )
 netCDF_file_loc = '/Users/jha3/Downloads/tsout_d06_2010-05-16_00:00:10'
 wrf_domain6 = xr.open_dataset(netCDF_file_loc)
 
@@ -33,6 +33,12 @@ proc_data_loc = '/Users/jha3/Downloads/proc_data'
 # reference time (based on NetCDF file name) and sampling time interval
 ref_time = netCDF_file_loc.split('_')
 dt = 10 # sec
+
+# In[] pickle file name
+start_time = datetime.fromisoformat(ref_time[-2]+ '_' + ref_time[-1]) - timedelta(seconds = dt)
+start_time_stamp = start_time.isoformat('_') #.split('_')[1]
+pickle_filename = f"pickled_%s.pkl"%start_time_stamp
+pickle_file = os.path.join(proc_data_loc, pickle_filename)
 
 # In[]:
 # Variables of interest
@@ -55,26 +61,20 @@ z_plane_locs = [20]
 
 vert_line_locs = [1] #D
 
-frac_time = 1.00 #0.03 # Fraction of time series to use
+frac_time = 0.04 # Fraction of time series to use
 
 # In[]
-#'''
-pickled_data, pickle_file = create_data (wrf_domain6, qoi_units_map, z_plane_locs, vert_line_locs, ref_time, dt, frac_time)
-#create_instantaneous_data (wrf_domain6, qoi_units_map, z_plane_locs, vert_line_locs, ref_time, dt, frac_time)
-
-with open(os.path.join(proc_data_loc, pickle_file), 'wb') as pickle_file_handle:
+'''
+pickled_data = create_data (wrf_domain6, qoi_units_map, z_plane_locs, vert_line_locs, ref_time, dt, start_time, frac_time)
+with open(pickle_file, 'wb') as pickle_file_handle:
     pickle.dump(pickled_data, pickle_file_handle)
-#'''    
+'''
+
 # In[]
-#'''
-pickle_file = 'pickled_2010-05-16_00:00:00.pkl'
-plot_contours_instantaneous(os.path.join(proc_data_loc, pickle_file), proc_data_loc, qoi_plot_map)
-#'''
+plot_contours_instantaneous(pickle_file, proc_data_loc, qoi_plot_map)
+
 # In[]
-#'''
-pickle_file = 'pickled_2010-05-16_00:00:00.pkl'
-plot_contours_time_avg(os.path.join(proc_data_loc, pickle_file), proc_data_loc, {'UMAG': 'm/s', 'W_AVG'   : 'm/s'})
-#'''
+plot_contours_time_avg(pickle_file, proc_data_loc, {'UMAG_AVG': 'm/s', 'W_AVG'   : 'm/s', 'TKE_AVG'   : 'm2/s2'})
 
 # In[]
 # Loop over QoI of interest to create plots

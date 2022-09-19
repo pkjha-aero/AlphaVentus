@@ -113,7 +113,25 @@ def get_z_slices_instantaneous(nc_data, qoi_units_map, z_plane_locs, ref_time, d
         
         z_slices_instantaneous[current_time_stamp] = z_slice_time
             
-    # In[]    
+    # In[]
+    for qoi in ['UMAG', 'TKE']:
+        space_avg = {}
+        for time_count, time_stamp in enumerate(z_slices_instantaneous.keys()):
+            current_time_stamp = time_stamp.split('_')[1]
+        
+            for space_count, zloc in enumerate(z_slices_instantaneous[time_stamp]):
+                z_slice_space = z_slices_instantaneous[time_stamp][zloc]
+                space = z_slice_space[qoi]
+                if time_count == 0:
+                    space_avg[zloc] = space
+                else:
+                    space_avg[zloc] += space
+         
+        for space_count, zloc in enumerate(space_avg.keys()):
+            space = space_avg[zloc]/len(z_slices_instantaneous.keys())
+            z_slices_time_avg[start_time.isoformat('_')][z_plane_locs[space_count]][qoi + '_AVG'] = space
+            
+    # In[]
     return z_slices_instantaneous, z_slices_time_avg
 
 # In[]
@@ -164,14 +182,11 @@ def get_z_slices_time_averaged(nc_data, qoi_list, z_plane_locs, ref_time, dt, st
     return z_slices_time_averaged
 
 # In[]
-def create_data (nc_data, qoi_units_map, z_plane_locs, vert_line_locs, ref_time, dt, frac_time):
+def create_data (nc_data, qoi_units_map, z_plane_locs, vert_line_locs, ref_time, dt, start_time, frac_time):
     pickled_data = {}
     
     # In[] Start time stamp to identify the beginning of a data set 
-    start_time = datetime.fromisoformat(ref_time[2]+ '_' + ref_time[3]) - timedelta(seconds = dt)
-    start_time_stamp = start_time.isoformat('_') #.split('_')[1]
-    pickled_data['start_time_stamp'] = start_time_stamp
-    pickle_filename = f"pickled_%s.pkl"%start_time_stamp
+    pickled_data['start_time_stamp'] = start_time.isoformat('_')
     
     # In[]
     # Extract grid resolution
@@ -190,6 +205,6 @@ def create_data (nc_data, qoi_units_map, z_plane_locs, vert_line_locs, ref_time,
     pickled_data['z_slices_instantaneous'], pickled_data['z_slices_time_avg'] = get_z_slices_instantaneous(nc_data, qoi_units_map, z_plane_locs, ref_time, dt, start_time, frac_time)
     
     # In[]
-    return pickled_data, pickle_filename
+    return pickled_data
     
     
