@@ -57,24 +57,34 @@ qoi_plot_map = {'UMAG': 'm/s',
                 'W'   : 'm/s'
                }
 
+qoi_range_map = {'UMAG'    : [8.0, 15.0],
+                 'UMAG_AVG': [8.0, 15.0],
+                 'TKE'     : [0.0, 7.0],
+                 'TKE_AVG' : [0.0, 7.0],
+                 'W'       : [-1.35, 1.35],
+                 'W_AVG'   : [-1.35, 1.35]
+    }
+
 z_plane_locs = [20]
 
 vert_line_locs = [1] #D
 
-frac_time = 0.04 # Fraction of time series to use
+frac_time = 1.0 #0.04 # Fraction of time series to use
 
 # In[]
-'''
+#'''
 pickled_data = create_data (wrf_domain6, qoi_units_map, z_plane_locs, vert_line_locs, ref_time, dt, start_time, frac_time)
 with open(pickle_file, 'wb') as pickle_file_handle:
     pickle.dump(pickled_data, pickle_file_handle)
-'''
+#'''
 
 # In[]
-plot_contours_instantaneous(pickle_file, proc_data_loc, qoi_plot_map)
+plot_contours_instantaneous(pickle_file, proc_data_loc, qoi_plot_map, qoi_range_map, [250, 350], [250, 350])
+plot_contours_instantaneous(pickle_file, proc_data_loc, qoi_plot_map, qoi_range_map)
 
 # In[]
-plot_contours_time_avg(pickle_file, proc_data_loc, {'UMAG_AVG': 'm/s', 'W_AVG'   : 'm/s', 'TKE_AVG'   : 'm2/s2'})
+plot_contours_time_avg(pickle_file, proc_data_loc, {'UMAG_AVG': 'm/s', 'W_AVG'   : 'm/s', 'TKE_AVG'   : 'm2/s2'}, qoi_range_map, [250, 350], [250, 350])
+plot_contours_time_avg(pickle_file, proc_data_loc, {'UMAG_AVG': 'm/s', 'W_AVG'   : 'm/s', 'TKE_AVG'   : 'm2/s2'}, qoi_range_map)
 
 # In[]
 # Loop over QoI of interest to create plots

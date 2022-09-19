@@ -16,7 +16,7 @@ from datetime import date, datetime, timedelta, time
 import pickle
 
 # In[]
-def plot_contours_instantaneous(pickle_file_name, plot_loc, qoi_plot_map):
+def plot_contours_instantaneous(pickle_file_name, plot_loc, qoi_plot_map, qoi_range_map, xlim=None, ylim=None):
     # In[] Read the pickle data
     with open(pickle_file_name, 'rb') as pickle_file_handle:
         pickled_data_read = pickle.load(pickle_file_handle)
@@ -51,8 +51,10 @@ def plot_contours_instantaneous(pickle_file_name, plot_loc, qoi_plot_map):
                 #print(ratio)
                 
                 plt.figure()
+                qoi_range = qoi_range_map[qoi]
+                cont_levels = np.linspace(qoi_range[0], qoi_range[1], 11)
                 plane_cols, plane_rows = np.meshgrid(range(space.shape[1]), range(space.shape[0]))
-                cont = plt.contourf(plane_cols*DX,plane_rows*DY, space, 20, cmap=cmap_name)
+                cont = plt.contourf(plane_cols*DX,plane_rows*DY, space, levels = cont_levels, cmap=cmap_name)
                 clb = plt.colorbar(cont)
                 clb.ax.set_title(f"%s [%s]"%(qoi, qoi_unit), weight='bold')
                 #plt.set_figheight(4.5*nTime)#figsize = (4.5*nTime)
@@ -62,17 +64,22 @@ def plot_contours_instantaneous(pickle_file_name, plot_loc, qoi_plot_map):
                 plt.tick_params(axis='x', labelsize=14)
                 plt.tick_params(axis='y', labelsize=14)
                 plt.title(f"%s, z = %.2f m" %(current_time_stamp, z), fontsize=14)
-                plt.xlim([250*DX,350*DX])
-                plt.ylim([250*DY,350*DY])
+                if xlim:
+                    plt.xlim([xlim[0]*DX,xlim[1]*DX])
+                if ylim:
+                    plt.ylim([ylim[0]*DY,ylim[1]*DY])
                 plt.tight_layout() 
-        
         
                 filename = "z_slice_%s_%s_%s_%s"%(qoi, current_time_stamp, 'bottom_top', str(zloc))
                 filedir = os.path.join(plot_loc, 'Instantaneous', qoi, 'bottom_top_' + str(zloc))
+                if xlim or ylim:
+                    filedir = os.path.join(filedir, 'zoomed')
+                else:
+                    filedir = os.path.join(filedir, 'full')
                 os.system('mkdir -p %s'%filedir)
                 plt.savefig(os.path.join(filedir, filename), bbox_inches='tight')
 # In[]    
-def plot_contours_time_avg(pickle_file_name, plot_loc, qoi_plot_map):
+def plot_contours_time_avg(pickle_file_name, plot_loc, qoi_plot_map, qoi_range_map, xlim=None, ylim=None):
     # In[] Read the pickle data
     with open(pickle_file_name, 'rb') as pickle_file_handle:
         pickled_data_read = pickle.load(pickle_file_handle)
@@ -107,8 +114,10 @@ def plot_contours_time_avg(pickle_file_name, plot_loc, qoi_plot_map):
             #print(ratio)
             
             plt.figure()
+            qoi_range = qoi_range_map[qoi]
+            cont_levels = np.linspace(qoi_range[0], qoi_range[1], 11)
             plane_cols, plane_rows = np.meshgrid(range(space.shape[1]), range(space.shape[0]))
-            cont = plt.contourf(plane_cols*DX,plane_rows*DY, space, 20, cmap=cmap_name)
+            cont = plt.contourf(plane_cols*DX,plane_rows*DY, space, levels = cont_levels, cmap=cmap_name)
             clb = plt.colorbar(cont)
             clb.ax.set_title(f"%s [%s]"%(qoi, qoi_unit), weight='bold')
             #plt.set_figheight(4.5*nTime)#figsize = (4.5*nTime)
@@ -118,13 +127,18 @@ def plot_contours_time_avg(pickle_file_name, plot_loc, qoi_plot_map):
             plt.tick_params(axis='x', labelsize=14)
             plt.tick_params(axis='y', labelsize=14)
             plt.title(f"%s, z = %.2f m" %(current_time_stamp, z), fontsize=14)
-            plt.xlim([250*DX,350*DX])
-            plt.ylim([250*DY,350*DY])
+            if xlim:
+                plt.xlim([xlim[0]*DX,xlim[1]*DX])
+            if ylim:
+                plt.ylim([ylim[0]*DY,ylim[1]*DY])
             plt.tight_layout() 
-    
     
             filename = "z_slice_%s_%s_%s_%s"%(qoi, current_time_stamp, 'bottom_top', str(zloc))
             filedir = os.path.join(plot_loc, 'TimeAvg', qoi, 'bottom_top_' + str(zloc))
+            if xlim or ylim:
+                filedir = os.path.join(filedir, 'zoomed')
+            else:
+                filedir = os.path.join(filedir, 'full')
             os.system('mkdir -p %s'%filedir)
             plt.savefig(os.path.join(filedir, filename), bbox_inches='tight')
                 
