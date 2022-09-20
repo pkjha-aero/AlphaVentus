@@ -27,7 +27,7 @@ plt.style.use('seaborn-white')
 netCDF_file_loc = '/Users/jha3/Downloads/tsout_d06_2010-05-16_00:00:10'
 wrf_domain6 = xr.open_dataset(netCDF_file_loc)
 
-proc_data_loc = '/Users/jha3/Downloads/proc_data'
+proc_data_loc = '/Users/jha3/Downloads/proc_data/CPM/part5'
 
 # In[]:
 # reference time (based on NetCDF file name) and sampling time interval
@@ -46,21 +46,30 @@ plane = ['xy','yz','xz']
 
 qoi_units_map = {'UTS': 'm/s',
                  'VTS': 'm/s',
-                 'WTS': 'm/s'
+                 'WTS': 'm/s',
+                 'TKETS': 'm2/s2'
                 }
 qoi_list = list(qoi_units_map.keys())
 #qoi_list = ['UTS']
 qoi_units = list(qoi_units_map.values())
 
 qoi_plot_map = {'UMAG': 'm/s',
-                'TKE' : 'm2/s2',
+                'TKE_RES': 'm2/s2',
+                'TKE_SGS': 'm2/s2',
+                'TKE_TOT': 'm2/s2',
                 'W'   : 'm/s'
                }
+qoi_plot_avg_map = {'UMAG_AVG': 'm/s',
+                    'TKE_RES_AVG': 'm2/s2',
+                    'TKE_SGS_AVG': 'm2/s2',
+                    'TKE_TOT_AVG': 'm2/s2',
+                    'W_AVG'   : 'm/s'
+                   }
 
-qoi_range_map = {'UMAG'    : [8.0, 15.0],
-                 'UMAG_AVG': [8.0, 15.0],
-                 'TKE'     : [0.0, 7.0],
-                 'TKE_AVG' : [0.0, 7.0],
+qoi_range_map = {'UMAG'    : [8.0, 20.0],
+                 'UMAG_AVG': [8.0, 20.0],
+                 'TKE_RES' : [0.0, 10.0],
+                 'TKE_RES_AVG' : [0.0, 10.0],
                  'W'       : [-1.35, 1.35],
                  'W_AVG'   : [-1.35, 1.35]
     }
@@ -69,7 +78,8 @@ z_plane_locs = [20]
 
 vert_line_locs = [1] #D
 
-frac_time = 1.0 #0.04 # Fraction of time series to use
+#frac_time = 0.04 # Fraction of time series to use
+frac_time = 1.00 # Fraction of time series to use
 
 # In[]
 #'''
@@ -83,8 +93,8 @@ plot_contours_instantaneous(pickle_file, proc_data_loc, qoi_plot_map, qoi_range_
 plot_contours_instantaneous(pickle_file, proc_data_loc, qoi_plot_map, qoi_range_map)
 
 # In[]
-plot_contours_time_avg(pickle_file, proc_data_loc, {'UMAG_AVG': 'm/s', 'W_AVG'   : 'm/s', 'TKE_AVG'   : 'm2/s2'}, qoi_range_map, [250, 350], [250, 350])
-plot_contours_time_avg(pickle_file, proc_data_loc, {'UMAG_AVG': 'm/s', 'W_AVG'   : 'm/s', 'TKE_AVG'   : 'm2/s2'}, qoi_range_map)
+plot_contours_time_avg(pickle_file, proc_data_loc, qoi_plot_avg_map, qoi_range_map, [250, 350], [250, 350])
+plot_contours_time_avg(pickle_file, proc_data_loc, qoi_plot_avg_map, qoi_range_map)
 
 # In[]
 # Loop over QoI of interest to create plots

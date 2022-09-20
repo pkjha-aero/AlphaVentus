@@ -103,18 +103,20 @@ def get_z_slices_instantaneous(nc_data, qoi_units_map, z_plane_locs, ref_time, d
             z_slice_space['V'] = z_slice_data['VTS'][time_count][space_count]
             z_slice_space['W'] = z_slice_data['WTS'][time_count][space_count]
             z_slice_space['UMAG'] = z_slice_data['UMAG'][time_count][space_count]
+            z_slice_space['TKE_SGS'] = z_slice_data['TKETS'][time_count][space_count]
             
             z_slice_space['UP'] = z_slice_space['U'] - z_slices_time_avg[start_time.isoformat('_')][z_plane_locs[space_count]]['U_AVG']
             z_slice_space['VP'] = z_slice_space['V'] - z_slices_time_avg[start_time.isoformat('_')][z_plane_locs[space_count]]['V_AVG']
             z_slice_space['WP'] = z_slice_space['W'] - z_slices_time_avg[start_time.isoformat('_')][z_plane_locs[space_count]]['W_AVG']
-            z_slice_space['TKE'] = 0.5*(np.square(z_slice_space['UP']) + np.square(z_slice_space['VP']) + np.square(z_slice_space['WP']))
+            z_slice_space['TKE_RES'] = 0.5*(np.square(z_slice_space['UP']) + np.square(z_slice_space['VP']) + np.square(z_slice_space['WP']))
+            z_slice_space['TKE_TOT'] = z_slice_space['TKE_RES'] + z_slice_space['TKE_SGS']
             
             z_slice_time[z_plane_locs[space_count]] = z_slice_space
         
         z_slices_instantaneous[current_time_stamp] = z_slice_time
             
     # In[]
-    for qoi in ['UMAG', 'TKE']:
+    for qoi in ['UMAG', 'TKE_RES', 'TKE_SGS', 'TKE_TOT']:
         space_avg = {}
         for time_count, time_stamp in enumerate(z_slices_instantaneous.keys()):
             current_time_stamp = time_stamp.split('_')[1]

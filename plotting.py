@@ -51,8 +51,11 @@ def plot_contours_instantaneous(pickle_file_name, plot_loc, qoi_plot_map, qoi_ra
                 #print(ratio)
                 
                 plt.figure()
-                qoi_range = qoi_range_map[qoi]
-                cont_levels = np.linspace(qoi_range[0], qoi_range[1], 11)
+                if qoi in qoi_range_map.keys():
+                    qoi_range = qoi_range_map[qoi]
+                    cont_levels = np.linspace(qoi_range[0], qoi_range[1], 15)
+                else:
+                    cont_levels = 20
                 plane_cols, plane_rows = np.meshgrid(range(space.shape[1]), range(space.shape[0]))
                 cont = plt.contourf(plane_cols*DX,plane_rows*DY, space, levels = cont_levels, cmap=cmap_name)
                 clb = plt.colorbar(cont)
@@ -114,8 +117,11 @@ def plot_contours_time_avg(pickle_file_name, plot_loc, qoi_plot_map, qoi_range_m
             #print(ratio)
             
             plt.figure()
-            qoi_range = qoi_range_map[qoi]
-            cont_levels = np.linspace(qoi_range[0], qoi_range[1], 11)
+            if qoi in qoi_range_map.keys():
+                qoi_range = qoi_range_map[qoi]
+                cont_levels = np.linspace(qoi_range[0], qoi_range[1], 15)
+            else:
+                cont_levels = 20
             plane_cols, plane_rows = np.meshgrid(range(space.shape[1]), range(space.shape[0]))
             cont = plt.contourf(plane_cols*DX,plane_rows*DY, space, levels = cont_levels, cmap=cmap_name)
             clb = plt.colorbar(cont)
