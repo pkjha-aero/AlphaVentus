@@ -81,6 +81,7 @@ def plot_contours_instantaneous(pickle_file_name, plot_loc, qoi_plot_map, qoi_ra
                     filedir = os.path.join(filedir, 'full')
                 os.system('mkdir -p %s'%filedir)
                 plt.savefig(os.path.join(filedir, filename), bbox_inches='tight')
+                plt.close()
 # In[]    
 def plot_contours_time_avg(pickle_file_name, plot_loc, qoi_plot_map, qoi_range_map, xlim=None, ylim=None):
     # In[] Read the pickle data
@@ -147,6 +148,7 @@ def plot_contours_time_avg(pickle_file_name, plot_loc, qoi_plot_map, qoi_range_m
                 filedir = os.path.join(filedir, 'full')
             os.system('mkdir -p %s'%filedir)
             plt.savefig(os.path.join(filedir, filename), bbox_inches='tight')
+            plt.close()
                 
 
 # In[]:

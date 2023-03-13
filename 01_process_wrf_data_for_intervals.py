@@ -20,25 +20,12 @@ import json
 import pickle
 from datetime import date, datetime, timedelta, time
 
+from timeit import default_timer as timer
+
 plt.style.use('seaborn-white')
 
 # In[]
-# Load NetCDF file containing tsout data and define plot location
-netCDF_file_loc = '/Users/jha3/Downloads/tsout_d06_2010-05-16_00:00:10'
-wrf_domain6 = xr.open_dataset(netCDF_file_loc)
-
-proc_data_loc = '/Users/jha3/Downloads/proc_data/CPM/part5'
-
-# In[]:
-# reference time (based on NetCDF file name) and sampling time interval
-ref_time = netCDF_file_loc.split('_')
-dt = 10 # sec
-
-# In[] pickle file name
-start_time = datetime.fromisoformat(ref_time[-2]+ '_' + ref_time[-1]) - timedelta(seconds = dt)
-start_time_stamp = start_time.isoformat('_') #.split('_')[1]
-pickle_filename = f"pickled_%s.pkl"%start_time_stamp
-pickle_file = os.path.join(proc_data_loc, pickle_filename)
+sim_start_time = timer()
 
 # In[]:
 # Variables of interest
@@ -76,33 +63,85 @@ qoi_range_map = {'UMAG'    : [8.0, 20.0],
                  'W_AVG'   : [-1.35, 1.35]
     }
 
+# In[]:
+interval_tsoutfile_map = {'part05': '2010-05-16_00:00:10'
+        }
+'''    
+interval_tsoutfile_map = {'part05': '2010-05-16_00:00:10',
+                          'part06': '2010-05-16_00:10:10',
+                          'part07': '2010-05-16_00:20:10',
+                          'part08': '2010-05-16_00:30:10',
+                          'part09': '2010-05-16_00:40:10',
+                          'part10': '2010-05-16_00:50:10',
+                          'part11': '2010-05-16_01:00:10',
+                          'part12': '2010-05-16_01:10:10',
+                          'part13': '2010-05-16_01:20:10',
+                          'part14': '2010-05-16_01:30:10',
+                          'part15': '2010-05-16_01:40:10'
+    }
+'''
+    
+# In[]:
 z_plane_locs = [20]
 
 vert_line_locs = [1] #D
 
-#frac_time = 0.04 # Fraction of time series to use
-frac_time = 1.00 # Fraction of time series to use
+dt = 10 # sec
+
+frac_time = 0.02 # Fraction of time series to use
+#frac_time = 1.00 # Fraction of time series to use
+
+# In[]:
+WRF_result_files_loc = '/Users/jha3/Downloads/AlphaVentusSimOutput/MesoMicro1_CPM'
+processed_results_loc = '/Users/jha3/Downloads/AlphaVentusProcessed/MesoMicro1_CPM'
 
 # In[]
-#'''
-pickled_data = create_data (wrf_domain6, qoi_units_map, z_plane_locs, vert_line_locs, ref_time, dt, start_time, frac_time)
-with open(pickle_file, 'wb') as pickle_file_handle:
-    pickle.dump(pickled_data, pickle_file_handle)
-#'''
+for interval, tsout_file_stamp in interval_tsoutfile_map.items():
+    interval_dir = '{}_outfiles'.format(interval)
+    tsoutfile_name = 'tsout_d06_{}'.format(tsout_file_stamp)
+    netCDF_file_loc = os.path.join(WRF_result_files_loc, interval_dir, tsoutfile_name)
+    
+    # Time stamps for tsoutfile and interval
+    tsout_time = netCDF_file_loc.split('_')
+    start_time = datetime.fromisoformat(tsout_time[-2]+ '_' + tsout_time[-1]) - timedelta(seconds = dt)
+    start_time_stamp = start_time.isoformat('_') #.split('_')[1]
+    
+    # Processed data location for this interval
+    proc_data_loc = os.path.join(processed_results_loc, '{}_procfiles'.format(interval))
+    
+    # pickle file name
+    pickle_file_name = '{}_pickled_{}.pkl'.format(interval, start_time_stamp)
+    pickle_file_loc = os.path.join(proc_data_loc, pickle_file_name)
+    
+    # Open tsout NetCDF data
+    tsout_domain6 = xr.open_dataset(netCDF_file_loc)
+    
+    # Create pickled data
+    pickled_data = create_data (tsout_domain6, qoi_units_map, z_plane_locs, vert_line_locs, tsout_time, dt, start_time, frac_time)
+    
+    # Write picked data
+    os.system('mkdir -p %s'%proc_data_loc)
+    with open(pickle_file_loc, 'wb') as pickle_file_handle:
+        pickle.dump(pickled_data, pickle_file_handle)
+    '''
+    # Plot contour plots of instantaneous data
+    plot_contours_instantaneous(pickle_file_loc, proc_data_loc, qoi_plot_map, qoi_range_map, [250, 350], [250, 350])
+    plot_contours_instantaneous(pickle_file_loc, proc_data_loc, qoi_plot_map, qoi_range_map)
+    
+    # Plot contour plots of averaged data
+    plot_contours_time_avg(pickle_file_loc, proc_data_loc, qoi_plot_avg_map, qoi_range_map, [250, 350], [250, 350])
+    plot_contours_time_avg(pickle_file_loc, proc_data_loc, qoi_plot_avg_map, qoi_range_map)
+    '''
 
 # In[]
-plot_contours_instantaneous(pickle_file, proc_data_loc, qoi_plot_map, qoi_range_map, [250, 350], [250, 350])
-plot_contours_instantaneous(pickle_file, proc_data_loc, qoi_plot_map, qoi_range_map)
+sim_end_time = timer()
+print('Total computing time: {} s'.format(sim_end_time - sim_start_time))
 
 # In[]
-plot_contours_time_avg(pickle_file, proc_data_loc, qoi_plot_avg_map, qoi_range_map, [250, 350], [250, 350])
-plot_contours_time_avg(pickle_file, proc_data_loc, qoi_plot_avg_map, qoi_range_map)
 
-# In[]
 # Loop over QoI of interest to create plots
 for (qoi, qoi_unit) in zip(qoi_list, qoi_units):
-    qoi_data, qoi_dim_names, qoi_dim = getQoI(wrf_domain6, qoi)
-
+    #qoi_data, qoi_dim_names, qoi_dim = getQoI(tsout_domain6, qoi)
     # In[]    
     '''
     # Plot contours at the desired times and spatial locations
@@ -144,5 +183,5 @@ for (qoi, qoi_unit) in zip(qoi_list, qoi_units):
     
     # In[]
     
-    # In[]  
-    dummy = 0
+# In[]
+dummy = 0
