@@ -16,6 +16,52 @@ from datetime import date, datetime, timedelta, time
 import pickle
 
 # In[]
+def plot_power_inst (pickle_file_name, plot_loc, dt):
+    # In[] Read the pickle data
+    with open(pickle_file_name, 'rb') as pickle_file_handle:
+        pickled_data_read = pickle.load(pickle_file_handle)
+        
+    plt.figure()
+    plt.plot(pickled_data_read['power_inst']/1.0e6)
+
+    plt.xlabel('Time Index', fontsize=14)
+    plt.ylabel('Power [MW]', fontsize=14)
+    plt.tick_params(axis='x', labelsize=14)
+    plt.tick_params(axis='y', labelsize=14)
+    plt.title('Time series of power', fontsize=14)
+
+    filename = 'Power_TimeSeries.png'
+    filedir = os.path.join(plot_loc, 'Instantaneous', 'Power')
+    os.system('mkdir -p %s'%filedir)
+    plt.savefig(os.path.join(filedir, filename), bbox_inches='tight')
+    plt.close()
+
+
+# In[]
+def plot_power_avg (pickle_file_name, plot_loc):
+    # In[] Read the pickle data
+    with open(pickle_file_name, 'rb') as pickle_file_handle:
+        pickled_data_read = pickle.load(pickle_file_handle)
+        
+    power_avg = pickled_data_read['power_avg']
+    intervals = np.array(range(len(power_avg))) + 1
+    plt.figure()
+    plt.bar(np.array(range(len(power_avg))) + 1, power_avg/1.0e6)
+
+    plt.xlabel('Interval', fontsize=14)
+    plt.ylabel('Power [MW]', fontsize=14)
+    plt.xticks(intervals)
+    plt.tick_params(axis='x', labelsize=14)
+    plt.tick_params(axis='y', labelsize=14)
+    plt.title('Average power over 10-min', fontsize=14)
+
+    filename = 'Power_TimeAvg.png'
+    filedir = os.path.join(plot_loc, 'TimeAvg', 'Power_Avg')
+    os.system('mkdir -p %s'%filedir)
+    plt.savefig(os.path.join(filedir, filename), bbox_inches='tight')
+    plt.close()
+
+# In[]
 def plot_contours_instantaneous(pickle_file_name, plot_loc, qoi_plot_map, qoi_range_map, xlim=None, ylim=None):
     # In[] Read the pickle data
     with open(pickle_file_name, 'rb') as pickle_file_handle:

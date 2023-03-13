@@ -43,6 +43,13 @@ def sampling_loc_time(qoi_dim_names, qoi_dim):
     return slt
 
 # In[]
+def get_power_data(nc_data):   
+    power_ts = np.array(nc_data['POWERTS'])
+    power_avg = np.array(nc_data['POWERTS'].mean(dim = 'Time'))
+    
+    return power_ts, power_avg
+
+# In[]
 def get_z_slices_instantaneous(nc_data, qoi_units_map, z_plane_locs, ref_time, dt, start_time, frac_time):
     z_slices_instantaneous = {}
     
@@ -202,6 +209,9 @@ def create_data (nc_data, qoi_units_map, z_plane_locs, vert_line_locs, ref_time,
     n_zloc        = np.size(z_plane_locs)
     n_axial_loc   = np.size(vert_line_locs)
     pickled_data.update({'n_time_stamps': n_time_stamps, 'n_zloc': n_zloc, 'n_axial_loc': n_axial_loc})
+    
+    # Pickled power data
+    pickled_data['power_inst'], pickled_data['power_avg'] = get_power_data(nc_data)
     
     # In[]
     pickled_data['z_slices_instantaneous'], pickled_data['z_slices_time_avg'] = get_z_slices_instantaneous(nc_data, qoi_units_map, z_plane_locs, ref_time, dt, start_time, frac_time)
