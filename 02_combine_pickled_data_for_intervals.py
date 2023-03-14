@@ -94,7 +94,9 @@ frac_time = 0.02 # Fraction of time series to use
 frac_time = 1.00 # Fraction of time series to use
 
 # In[]:
-processed_results_loc = '/Users/jha3/Downloads/AlphaVentusProcessed_PowerOnly/MesoMicro1_CPM'
+case_name = 'MesoMicro1_CPM'
+processed_results_loc_base = '/Users/jha3/Downloads/AlphaVentusProcessed_PowerOnly'
+processed_results_loc = os.path.join(processed_results_loc_base, case_name)
 proc_data_loc_for_combined = os.path.join(processed_results_loc, 'combined_procfiles')
  
 # pickle file for combined
@@ -129,6 +131,11 @@ for interval, tsout_file_stamp in interval_tsoutfile_map.items():
 os.system('mkdir -p %s'%proc_data_loc_for_combined)
 with open(pickle_file_loc_for_combined, 'wb') as pickle_file_handle:
     pickle.dump(pickled_data_combined, pickle_file_handle)
+
+# In[]    
+plot_power_inst (pickle_file_loc_for_combined, proc_data_loc_for_combined, case_name, dt)
+plot_power_avg (pickle_file_loc_for_combined, proc_data_loc_for_combined, case_name)
+plot_power_histogram (pickle_file_loc_for_combined, proc_data_loc_for_combined, case_name, num_bins = 30)
     
 # In[]
 # Open the combined pickled data saved above

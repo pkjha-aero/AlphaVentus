@@ -16,7 +16,7 @@ from datetime import date, datetime, timedelta, time
 import pickle
 
 # In[]
-def plot_power_inst (pickle_file_name, plot_loc, dt):
+def plot_power_inst (pickle_file_name, plot_loc, case_name, dt, ylim=None):
     # In[] Read the pickle data
     with open(pickle_file_name, 'rb') as pickle_file_handle:
         pickled_data_read = pickle.load(pickle_file_handle)
@@ -30,7 +30,29 @@ def plot_power_inst (pickle_file_name, plot_loc, dt):
     plt.tick_params(axis='y', labelsize=14)
     plt.title('Time series of power', fontsize=14)
 
-    filename = 'Power_TimeSeries.png'
+    filename = 'Power_TS_{}.png'.format(case_name)
+    filedir = os.path.join(plot_loc, 'Instantaneous', 'Power')
+    os.system('mkdir -p %s'%filedir)
+    plt.savefig(os.path.join(filedir, filename), bbox_inches='tight')
+    plt.close()
+    
+
+# In[]
+def plot_power_histogram (pickle_file_name, plot_loc, case_name, num_bins = 20):
+    # In[] Read the pickle data
+    with open(pickle_file_name, 'rb') as pickle_file_handle:
+        pickled_data_read = pickle.load(pickle_file_handle)
+        
+    plt.figure()
+    plt.hist(pickled_data_read['power_inst']/1.0e6, num_bins, density=1, color = 'green', alpha = 0.7)
+
+    plt.ylabel('Freq', fontsize=14)
+    plt.xlabel('Power [MW]', fontsize=14)
+    plt.tick_params(axis='x', labelsize=14)
+    plt.tick_params(axis='y', labelsize=14)
+    plt.title('Histogram of power', fontsize=14)
+
+    filename = 'Power_Hist_{}.png'.format(case_name)
     filedir = os.path.join(plot_loc, 'Instantaneous', 'Power')
     os.system('mkdir -p %s'%filedir)
     plt.savefig(os.path.join(filedir, filename), bbox_inches='tight')
@@ -38,7 +60,7 @@ def plot_power_inst (pickle_file_name, plot_loc, dt):
 
 
 # In[]
-def plot_power_avg (pickle_file_name, plot_loc):
+def plot_power_avg (pickle_file_name, plot_loc, case_name, ylim=None):
     # In[] Read the pickle data
     with open(pickle_file_name, 'rb') as pickle_file_handle:
         pickled_data_read = pickle.load(pickle_file_handle)
@@ -46,16 +68,18 @@ def plot_power_avg (pickle_file_name, plot_loc):
     power_avg = pickled_data_read['power_avg']
     intervals = np.array(range(len(power_avg))) + 1
     plt.figure()
-    plt.bar(np.array(range(len(power_avg))) + 1, power_avg/1.0e6)
+    plt.bar(intervals, power_avg.flatten()/1.0e6, width = 0.4)
 
     plt.xlabel('Interval', fontsize=14)
     plt.ylabel('Power [MW]', fontsize=14)
+    if ylim:
+        plt.ylim([ylim[0],ylim[1]])
     plt.xticks(intervals)
     plt.tick_params(axis='x', labelsize=14)
     plt.tick_params(axis='y', labelsize=14)
     plt.title('Average power over 10-min', fontsize=14)
 
-    filename = 'Power_TimeAvg.png'
+    filename = 'Power_TimeAvg_{}.png'.format(case_name)
     filedir = os.path.join(plot_loc, 'TimeAvg', 'Power_Avg')
     os.system('mkdir -p %s'%filedir)
     plt.savefig(os.path.join(filedir, filename), bbox_inches='tight')
