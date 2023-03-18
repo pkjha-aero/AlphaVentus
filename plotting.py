@@ -127,16 +127,25 @@ def plot_contours_instantaneous(pickle_file_name, plot_loc, qoi_plot_map, qoi_ra
                 else:
                     cont_levels = 20
                 plane_cols, plane_rows = np.meshgrid(range(space.shape[1]), range(space.shape[0]))
-                cont = plt.contourf(plane_cols*DX,plane_rows*DY, space, levels = cont_levels, cmap=cmap_name)
+                cont = plt.contourf(plane_cols*DX,plane_rows*DY, space, levels = cont_levels, cmap=cmap_name, extend='both')
+                #cont = plt.contourf(plane_cols*DX,plane_rows*DY, space, cmap=cmap_name)
                 clb = plt.colorbar(cont)
-                clb.ax.set_title(f"%s [%s]"%(qoi, qoi_unit), weight='bold')
+                #clb.ax.set_title(f"%s [%s]"%(qoi, qoi_unit), weight='bold')
+                clb.ax.tick_params(labelsize=14)
                 #plt.set_figheight(4.5*nTime)#figsize = (4.5*nTime)
                 #plt.set_figwidth(5*nSpace*ratio)
-                plt.xlabel(f"%s [m]"%'west_east', fontsize=14)
-                plt.ylabel(f"%s [m]"%'south_north', fontsize=14)
+                #plt.xlabel(f"%s [m]"%'west_east', fontsize=14)
+                plt.xlabel(f"%s [m]"%'x', fontsize=14)
+                #plt.ylabel(f"%s [m]"%'south_north', fontsize=14)
+                plt.ylabel(f"%s [m]"%'y', fontsize=14)
                 plt.tick_params(axis='x', labelsize=14)
                 plt.tick_params(axis='y', labelsize=14)
-                plt.title(f"%s, z = %.2f m" %(current_time_stamp, z), fontsize=14)
+                #plt.title(f"%s, z = %.2f m" %(current_time_stamp, z), fontsize=14)
+                if 'UMAG' in qoi:
+                    plt.title("%s [%s]"%('Wind Speed', qoi_unit), fontsize=14)
+                else:
+                    plt.title("%s [%s]"%(qoi, qoi_unit), fontsize=14)
+                    
                 if xlim:
                     plt.xlim([xlim[0]*DX,xlim[1]*DX])
                 if ylim:
@@ -194,16 +203,25 @@ def plot_contours_time_avg(pickle_file_name, plot_loc, qoi_plot_map, qoi_range_m
             else:
                 cont_levels = 20
             plane_cols, plane_rows = np.meshgrid(range(space.shape[1]), range(space.shape[0]))
-            cont = plt.contourf(plane_cols*DX,plane_rows*DY, space, levels = cont_levels, cmap=cmap_name)
+            #cont = plt.contourf(plane_cols*DX,plane_rows*DY, space, levels = cont_levels, cmap=cmap_name)
+            cont = plt.contourf(plane_cols*DX,plane_rows*DY, space, levels = cont_levels, cmap=cmap_name, extend='both')
             clb = plt.colorbar(cont)
-            clb.ax.set_title(f"%s [%s]"%(qoi, qoi_unit), weight='bold')
+            #clb.ax.set_title(f"%s [%s]"%(qoi, qoi_unit), weight='bold')
+            clb.ax.tick_params(labelsize=14)
             #plt.set_figheight(4.5*nTime)#figsize = (4.5*nTime)
             #plt.set_figwidth(5*nSpace*ratio)
-            plt.xlabel(f"%s [m]"%'west_east', fontsize=14)
-            plt.ylabel(f"%s [m]"%'south_north', fontsize=14)
+            #plt.xlabel(f"%s [m]"%'west_east', fontsize=14)
+            plt.xlabel(f"%s [m]"%'x', fontsize=14)
+            #plt.ylabel(f"%s [m]"%'south_north', fontsize=14)
+            plt.ylabel(f"%s [m]"%'y', fontsize=14)
             plt.tick_params(axis='x', labelsize=14)
             plt.tick_params(axis='y', labelsize=14)
-            plt.title(f"%s, z = %.2f m" %(current_time_stamp, z), fontsize=14)
+            #plt.title(f"%s, z = %.2f m" %(current_time_stamp, z), fontsize=14)
+            if 'UMAG' in qoi:
+                plt.title("%s [%s]"%('Wind Speed', qoi_unit), fontsize=14)
+            else:
+                plt.title("%s [%s]"%(qoi, qoi_unit), fontsize=14)
+           
             if xlim:
                 plt.xlim([xlim[0]*DX,xlim[1]*DX])
             if ylim:

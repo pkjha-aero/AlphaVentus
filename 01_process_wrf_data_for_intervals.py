@@ -47,6 +47,9 @@ qoi_plot_map = {'UMAG': 'm/s',
                 'TKE_TOT': 'm2/s2',
                 'W'   : 'm/s'
                }
+
+qoi_plot_map = {'UMAG': 'm/s'}
+
 qoi_plot_avg_map = {'UMAG_AVG': 'm/s',
                     'TKE_RES_AVG': 'm2/s2',
                     'TKE_SGS_AVG': 'm2/s2',
@@ -54,8 +57,10 @@ qoi_plot_avg_map = {'UMAG_AVG': 'm/s',
                     'W_AVG'   : 'm/s'
                    }
 
-qoi_range_map = {'UMAG'    : [8.0, 20.0],
-                 'UMAG_AVG': [8.0, 20.0],
+qoi_plot_avg_map = {'UMAG_AVG': 'm/s'}
+
+qoi_range_map = {'UMAG'    : [8.0, 15.0],
+                 'UMAG_AVG': [8.0, 15.0],
                  'TKE_RES' : [0.0, 10.0],
                  'TKE_RES_AVG' : [0.0, 10.0],
                  'TKE_SGS' : [0.0, 0.6],
@@ -98,7 +103,7 @@ case_name = 'MesoMicro1_CPM'
 WRF_result_loc_base ='/Users/jha3/Downloads/AlphaVentusSimOutput'
 WRF_result_files_loc = os.path.join(WRF_result_loc_base, case_name)
 
-processed_results_loc_base = '/Users/jha3/Downloads/AlphaVentusProcessed_PowerOnly'
+processed_results_loc_base = '/Users/jha3/Downloads/AlphaVentusProcessed'
 processed_results_loc = os.path.join(processed_results_loc_base, case_name)
 
 # In[]
@@ -118,7 +123,7 @@ for interval, tsout_file_stamp in interval_tsoutfile_map.items():
     # pickle file name
     pickle_file_name = '{}_pickled_{}.pkl'.format(interval, start_time_stamp)
     pickle_file_loc = os.path.join(proc_data_loc, pickle_file_name)
-    
+    '''
     # Open tsout NetCDF data
     tsout_domain6 = xr.open_dataset(netCDF_file_loc)
     
@@ -129,8 +134,8 @@ for interval, tsout_file_stamp in interval_tsoutfile_map.items():
     os.system('mkdir -p %s'%proc_data_loc)
     with open(pickle_file_loc, 'wb') as pickle_file_handle:
         pickle.dump(pickled_data, pickle_file_handle)
-    
-
+    '''
+    '''
     # Plot Line Plot of instantaneous and avg power
     plot_power_inst (pickle_file_loc, proc_data_loc, case_name, dt)
     plot_power_avg (pickle_file_loc, proc_data_loc, case_name)
@@ -142,7 +147,6 @@ for interval, tsout_file_stamp in interval_tsoutfile_map.items():
     # Plot contour plots of averaged data
     plot_contours_time_avg(pickle_file_loc, proc_data_loc, qoi_plot_avg_map, qoi_range_map, [250, 350], [250, 350])
     plot_contours_time_avg(pickle_file_loc, proc_data_loc, qoi_plot_avg_map, qoi_range_map)
-    '''
 
 # In[]
 sim_end_time = timer()
