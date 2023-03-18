@@ -6,6 +6,7 @@
 from data_processing import *
 from plotting import *
 
+# In[]
 import os
 import sys
 #import wrf
@@ -92,8 +93,13 @@ frac_time = 0.02 # Fraction of time series to use
 frac_time = 1.00 # Fraction of time series to use
 
 # In[]:
-WRF_result_files_loc = '/Users/jha3/Downloads/AlphaVentusSimOutput/MesoMicro1_CPM'
-processed_results_loc = '/Users/jha3/Downloads/AlphaVentusProcessed/MesoMicro1_CPM'
+case_name = 'MesoMicro1_CPM'
+
+WRF_result_loc_base ='/Users/jha3/Downloads/AlphaVentusSimOutput'
+WRF_result_files_loc = os.path.join(WRF_result_loc_base, case_name)
+
+processed_results_loc_base = '/Users/jha3/Downloads/AlphaVentusProcessed_PowerOnly'
+processed_results_loc = os.path.join(processed_results_loc_base, case_name)
 
 # In[]
 for interval, tsout_file_stamp in interval_tsoutfile_map.items():
@@ -123,10 +129,11 @@ for interval, tsout_file_stamp in interval_tsoutfile_map.items():
     os.system('mkdir -p %s'%proc_data_loc)
     with open(pickle_file_loc, 'wb') as pickle_file_handle:
         pickle.dump(pickled_data, pickle_file_handle)
-      
+    
+
     # Plot Line Plot of instantaneous and avg power
-    plot_power_inst (pickle_file_loc, proc_data_loc, dt)
-    plot_power_avg (pickle_file_loc, proc_data_loc)
+    plot_power_inst (pickle_file_loc, proc_data_loc, case_name, dt)
+    plot_power_avg (pickle_file_loc, proc_data_loc, case_name)
     '''
     # Plot contour plots of instantaneous data
     plot_contours_instantaneous(pickle_file_loc, proc_data_loc, qoi_plot_map, qoi_range_map, [250, 350], [250, 350])
