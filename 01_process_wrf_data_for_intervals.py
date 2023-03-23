@@ -92,9 +92,9 @@ frac_time = 0.02 # Fraction of time series to use
 
 # In[]
 # Flags etc.
-extract_slice_data = True
+extract_slice_data = False
 extract_power_data = True
-plot_slice_data = True
+plot_slice_data = False
 plot_power_data = True
 
 # In[]:
@@ -106,6 +106,9 @@ WRF_result_case_loc = os.path.join(WRF_result_base_loc, case_name)
 
 processed_slice_base_loc = '/Users/jha3/Downloads/AlphaVentus_Slice'
 processed_slice_case_loc = os.path.join(processed_slice_base_loc, case_name)
+
+processed_power_base_loc = '/Users/jha3/Downloads/AlphaVentus_Power'
+processed_power_case_loc = os.path.join(processed_power_base_loc, case_name)
 
 # In[]
 for interval, tsout_file_stamp in interval_tsoutfile_map.items():
@@ -120,7 +123,8 @@ for interval, tsout_file_stamp in interval_tsoutfile_map.items():
     
     # Open tsout NetCDF data
     tsout_interval_domain6 = xr.open_dataset(netCDF_file_for_interval)
-    
+   
+    # In[]
     if extract_slice_data or plot_slice_data:
         # Processed slice data location for this interval
         processed_slice_interval_loc = os.path.join(processed_slice_case_loc, '{}_procfiles'.format(interval))
@@ -137,12 +141,6 @@ for interval, tsout_file_stamp in interval_tsoutfile_map.items():
         os.system('mkdir -p %s'%processed_slice_interval_loc)
         with open(pickled_slice_interval_file, 'wb') as pickled_slice_interval_file_handle:
             pickle.dump(pickled_slice_data_interval, pickled_slice_interval_file_handle)
- 
-    '''
-    # Plot Line Plot of instantaneous and avg power
-    plot_power_inst (pickle_file_loc, proc_data_loc, case_name, dt)
-    plot_power_avg (pickle_file_loc, proc_data_loc, case_name)
-    '''
     
     if plot_slice_data:
         # Plot contour plots of instantaneous data
@@ -152,6 +150,29 @@ for interval, tsout_file_stamp in interval_tsoutfile_map.items():
         # Plot contour plots of averaged data
         plot_contours_time_avg(pickled_slice_interval_file, processed_slice_interval_loc, qoi_plot_avg_map, qoi_range_map, [250, 350], [250, 350])
         plot_contours_time_avg(pickled_slice_interval_file, processed_slice_interval_loc, qoi_plot_avg_map, qoi_range_map)
+        
+    # In[]    
+    if extract_power_data or plot_power_data:
+        # Processed slice data location for this interval
+        processed_power_interval_loc = os.path.join(processed_power_case_loc, '{}_procfiles'.format(interval))
+        
+        # Pickle file name for processed slice data
+        pickled_power_interval_file_name = '{}_power_{}.pkl'.format(interval, start_time_stamp)
+        pickled_power_interval_file = os.path.join(processed_power_interval_loc, pickled_power_interval_file_name)
+        
+    if extract_power_data:
+        # Create pickled data
+        pickled_power_data_interval = create_power_data (tsout_interval_domain6, start_time)
+        
+        # Write picked data
+        os.system('mkdir -p %s'%processed_power_interval_loc)
+        with open(pickled_power_interval_file, 'wb') as pickled_power_interval_file_handle:
+            pickle.dump(pickled_power_data_interval, pickled_power_interval_file_handle)
+            
+    if plot_power_data:
+        # Plot instantaneous and avg power
+        plot_power_inst (pickled_power_interval_file, processed_power_interval_loc, case_name, dt)
+        plot_power_avg (pickled_power_interval_file, processed_power_interval_loc, case_name)
 
 # In[]
 sim_end_time = timer()

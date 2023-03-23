@@ -214,19 +214,22 @@ def create_base_data (nc_data, start_time):
     return pickled_base_data
 
 # In[]
+def create_power_data (nc_data, start_time):
+    pickled_data = create_base_data(nc_data, start_time)
+    
+    # Pickled power data
+    pickled_data['power_inst'], pickled_data['power_avg'] = get_power_data(nc_data)
+    
+    return pickled_data
+
+# In[]
 def create_slice_data (nc_data, qoi_from_tsout_file, z_plane_locs, vert_line_locs, ref_time, dt, start_time, frac_time):
     pickled_data = create_base_data(nc_data, start_time)
     
     n_zloc        = np.size(z_plane_locs)
     pickled_data.update({'n_zloc': n_zloc})
     
-    # Pickled power data
-    #pickled_data['power_inst'], pickled_data['power_avg'] = get_power_data(nc_data)
-    
-    # In[]
     pickled_data['z_slices_instantaneous'], pickled_data['z_slices_time_avg'] = get_z_slices_instantaneous(nc_data, qoi_from_tsout_file, z_plane_locs, ref_time, dt, start_time, frac_time)
     
-    # In[]
     return pickled_data
-    
     
