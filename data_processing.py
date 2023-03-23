@@ -191,24 +191,34 @@ def get_z_slices_time_averaged(nc_data, qoi_list, z_plane_locs, ref_time, dt, st
     return z_slices_time_averaged
 
 # In[]
-def create_slice_data (nc_data, qoi_from_tsout_file, z_plane_locs, vert_line_locs, ref_time, dt, start_time, frac_time):
-    pickled_data = {}
+def create_base_data (nc_data, start_time):
+    pickled_base_data = {}
     
     # In[] Start time stamp to identify the beginning of a data set 
-    pickled_data['start_time_stamp'] = start_time.isoformat('_')
+    pickled_base_data['start_time_stamp'] = start_time.isoformat('_')
     
     # In[]
     # Extract grid resolution
     DX = nc_data.DX
     DY = nc_data.DY
-    pickled_data.update({'DX': DX, 'DY': DY})
+    pickled_base_data.update({'DX': DX, 'DY': DY})
     
     # In[]
     # Find number of time stamps, z-locations, and axial locations for sampling
     n_time_stamps = nc_data.dims['Time']
+    pickled_base_data.update({'n_time_stamps': n_time_stamps})
+    
+    #n_axial_loc   = np.size(vert_line_locs)
+    
+    # In[]
+    return pickled_base_data
+
+# In[]
+def create_slice_data (nc_data, qoi_from_tsout_file, z_plane_locs, vert_line_locs, ref_time, dt, start_time, frac_time):
+    pickled_data = create_base_data(nc_data, start_time)
+    
     n_zloc        = np.size(z_plane_locs)
-    n_axial_loc   = np.size(vert_line_locs)
-    pickled_data.update({'n_time_stamps': n_time_stamps, 'n_zloc': n_zloc, 'n_axial_loc': n_axial_loc})
+    pickled_data.update({'n_zloc': n_zloc})
     
     # Pickled power data
     #pickled_data['power_inst'], pickled_data['power_avg'] = get_power_data(nc_data)

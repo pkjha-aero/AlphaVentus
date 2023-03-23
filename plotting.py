@@ -97,7 +97,6 @@ def plot_contours_instantaneous(pickle_file_name, plot_loc, qoi_plot_map, qoi_ra
     DY = pickled_data_read['DX']
     n_time_stamps = pickled_data_read['n_time_stamps']
     n_zloc = pickled_data_read['n_zloc']
-    n_axial_loc = pickled_data_read['n_axial_loc']
     
     z_slices_instantaneous = pickled_data_read['z_slices_instantaneous']
     
@@ -173,7 +172,6 @@ def plot_contours_time_avg(pickle_file_name, plot_loc, qoi_plot_map, qoi_range_m
     DY = pickled_data_read['DX']
     n_time_stamps = pickled_data_read['n_time_stamps']
     n_zloc = pickled_data_read['n_zloc']
-    n_axial_loc = pickled_data_read['n_axial_loc']
     
     z_slices_time_avg = pickled_data_read['z_slices_time_avg']
     
