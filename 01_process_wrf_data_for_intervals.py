@@ -76,6 +76,7 @@ interval_tsoutfile_map = {'part05': '2010-05-16_00:00:10',
                           'part13': '2010-05-16_01:20:10',
                           'part14': '2010-05-16_01:30:10',
                           'part15': '2010-05-16_01:40:10'
+                          'part16': '2010-05-16_01:50:10'
     }
 '''
     
@@ -86,46 +87,54 @@ vert_line_locs = [1] #D
 
 dt = 10 # sec
 
-frac_time = 0.05 # Fraction of time series to use
+frac_time = 0.02 # Fraction of time series to use
 #frac_time = 1.00 # Fraction of time series to use
+
+# In[]
+# Flags etc.
+extract_slice_data = True
+extract_power_data = True
+plot_slice_data = True
+plot_power_data = True
 
 # In[]:
 case_name = 'MesoMicro1_CPM'
 
-WRF_result_loc_base ='/Users/jha3/Downloads/AlphaVentusSimOutput'
-WRF_result_files_loc = os.path.join(WRF_result_loc_base, case_name)
+# Path from where to extract data
+WRF_result_base_loc ='/Users/jha3/Downloads/AlphaVentusSimOutput'
+WRF_result_case_loc = os.path.join(WRF_result_base_loc, case_name)
 
-processed_results_loc_base = '/Users/jha3/Downloads/AlphaVentusProcessed_Test'
-processed_results_loc = os.path.join(processed_results_loc_base, case_name)
+processed_slice_base_loc = '/Users/jha3/Downloads/AlphaVentus_Slice'
+processed_slice_case_loc = os.path.join(processed_slice_base_loc, case_name)
 
 # In[]
 for interval, tsout_file_stamp in interval_tsoutfile_map.items():
     interval_dir = '{}_outfiles'.format(interval)
-    tsoutfile_name = 'tsout_d06_{}'.format(tsout_file_stamp)
-    netCDF_file_loc = os.path.join(WRF_result_files_loc, interval_dir, tsoutfile_name)
+    tsoutfile_for_interval = 'tsout_d06_{}'.format(tsout_file_stamp)
+    netCDF_file_for_interval = os.path.join(WRF_result_case_loc, interval_dir, tsoutfile_for_interval)
     
     # Time stamps for tsoutfile and interval
-    tsout_time = netCDF_file_loc.split('_')
+    tsout_time = netCDF_file_for_interval.split('_')
     start_time = datetime.fromisoformat(tsout_time[-2]+ '_' + tsout_time[-1]) - timedelta(seconds = dt)
     start_time_stamp = start_time.isoformat('_') #.split('_')[1]
     
     # Processed data location for this interval
-    proc_data_loc = os.path.join(processed_results_loc, '{}_procfiles'.format(interval))
+    processed_slice_interval_loc = os.path.join(processed_slice_case_loc, '{}_procfiles'.format(interval))
     
     # pickle file name
-    pickle_file_name = '{}_pickled_{}.pkl'.format(interval, start_time_stamp)
-    pickle_file_loc = os.path.join(proc_data_loc, pickle_file_name)
+    pickled_slice_interval_file_name = '{}_slice_{}.pkl'.format(interval, start_time_stamp)
+    pickled_slice_interval_file = os.path.join(processed_slice_interval_loc, pickled_slice_interval_file_name)
     #'''
     # Open tsout NetCDF data
-    tsout_domain6 = xr.open_dataset(netCDF_file_loc)
+    tsout_interval_domain6 = xr.open_dataset(netCDF_file_for_interval)
     
     # Create pickled data
-    pickled_data = create_data (tsout_domain6, qoi_from_tsout_file, z_plane_locs, vert_line_locs, tsout_time, dt, start_time, frac_time)
+    pickled_slice_data_interval = create_slice_data (tsout_interval_domain6, qoi_from_tsout_file, z_plane_locs, vert_line_locs, tsout_time, dt, start_time, frac_time)
     
     # Write picked data
-    os.system('mkdir -p %s'%proc_data_loc)
-    with open(pickle_file_loc, 'wb') as pickle_file_handle:
-        pickle.dump(pickled_data, pickle_file_handle)
+    os.system('mkdir -p %s'%processed_slice_interval_loc)
+    with open(pickled_slice_interval_file, 'wb') as pickled_slice_interval_file_handle:
+        pickle.dump(pickled_slice_data_interval, pickled_slice_interval_file_handle)
     #'''
     '''
     # Plot Line Plot of instantaneous and avg power
@@ -133,12 +142,12 @@ for interval, tsout_file_stamp in interval_tsoutfile_map.items():
     plot_power_avg (pickle_file_loc, proc_data_loc, case_name)
     '''
     # Plot contour plots of instantaneous data
-    plot_contours_instantaneous(pickle_file_loc, proc_data_loc, qoi_plot_map, qoi_range_map, [250, 350], [250, 350])
-    plot_contours_instantaneous(pickle_file_loc, proc_data_loc, qoi_plot_map, qoi_range_map)
+    plot_contours_instantaneous(pickled_slice_interval_file, processed_slice_interval_loc, qoi_plot_map, qoi_range_map, [250, 350], [250, 350])
+    plot_contours_instantaneous(pickled_slice_interval_file, processed_slice_interval_loc, qoi_plot_map, qoi_range_map)
     
     # Plot contour plots of averaged data
-    plot_contours_time_avg(pickle_file_loc, proc_data_loc, qoi_plot_avg_map, qoi_range_map, [250, 350], [250, 350])
-    plot_contours_time_avg(pickle_file_loc, proc_data_loc, qoi_plot_avg_map, qoi_range_map)
+    plot_contours_time_avg(pickled_slice_interval_file, processed_slice_interval_loc, qoi_plot_avg_map, qoi_range_map, [250, 350], [250, 350])
+    plot_contours_time_avg(pickled_slice_interval_file, processed_slice_interval_loc, qoi_plot_avg_map, qoi_range_map)
 
 # In[]
 sim_end_time = timer()
