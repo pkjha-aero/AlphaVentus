@@ -30,16 +30,8 @@ sim_start_time = timer()
 
 # In[]:
 # Variables of interest
-plane = ['xy','yz','xz']
 
-qoi_units_map = {'UTS': 'm/s',
-                 'VTS': 'm/s',
-                 'WTS': 'm/s',
-                 'TKETS': 'm2/s2'
-                }
-qoi_list = list(qoi_units_map.keys())
-#qoi_list = ['UTS']
-qoi_units = list(qoi_units_map.values())
+qoi_from_tsout_file = ['UTS','VTS', 'WTS', 'TKETS']
 
 qoi_plot_map = {'UMAG': 'm/s',
                 'TKE_RES': 'm2/s2',
@@ -67,7 +59,7 @@ qoi_range_map = {'UMAG'    : [8.0, 15.0],
                  'TKE_SGS_AVG' : [0.0, 0.6],
                  'W'       : [-1.35, 1.35],
                  'W_AVG'   : [-1.35, 1.35]
-    }
+                }
 
 # In[]:
 interval_tsoutfile_map = {'part05': '2010-05-16_00:00:10'
@@ -94,8 +86,8 @@ vert_line_locs = [1] #D
 
 dt = 10 # sec
 
-frac_time = 0.02 # Fraction of time series to use
-frac_time = 1.00 # Fraction of time series to use
+frac_time = 0.05 # Fraction of time series to use
+#frac_time = 1.00 # Fraction of time series to use
 
 # In[]:
 case_name = 'MesoMicro1_CPM'
@@ -103,7 +95,7 @@ case_name = 'MesoMicro1_CPM'
 WRF_result_loc_base ='/Users/jha3/Downloads/AlphaVentusSimOutput'
 WRF_result_files_loc = os.path.join(WRF_result_loc_base, case_name)
 
-processed_results_loc_base = '/Users/jha3/Downloads/AlphaVentusProcessed'
+processed_results_loc_base = '/Users/jha3/Downloads/AlphaVentusProcessed_Test'
 processed_results_loc = os.path.join(processed_results_loc_base, case_name)
 
 # In[]
@@ -123,18 +115,18 @@ for interval, tsout_file_stamp in interval_tsoutfile_map.items():
     # pickle file name
     pickle_file_name = '{}_pickled_{}.pkl'.format(interval, start_time_stamp)
     pickle_file_loc = os.path.join(proc_data_loc, pickle_file_name)
-    '''
+    #'''
     # Open tsout NetCDF data
     tsout_domain6 = xr.open_dataset(netCDF_file_loc)
     
     # Create pickled data
-    pickled_data = create_data (tsout_domain6, qoi_units_map, z_plane_locs, vert_line_locs, tsout_time, dt, start_time, frac_time)
+    pickled_data = create_data (tsout_domain6, qoi_from_tsout_file, z_plane_locs, vert_line_locs, tsout_time, dt, start_time, frac_time)
     
     # Write picked data
     os.system('mkdir -p %s'%proc_data_loc)
     with open(pickle_file_loc, 'wb') as pickle_file_handle:
         pickle.dump(pickled_data, pickle_file_handle)
-    '''
+    #'''
     '''
     # Plot Line Plot of instantaneous and avg power
     plot_power_inst (pickle_file_loc, proc_data_loc, case_name, dt)
@@ -152,51 +144,6 @@ for interval, tsout_file_stamp in interval_tsoutfile_map.items():
 sim_end_time = timer()
 print('Total computing time: {} s'.format(sim_end_time - sim_start_time))
 
-# In[]
-
-# Loop over QoI of interest to create plots
-for (qoi, qoi_unit) in zip(qoi_list, qoi_units):
-    #qoi_data, qoi_dim_names, qoi_dim = getQoI(tsout_domain6, qoi)
-    # In[]    
-    '''
-    # Plot contours at the desired times and spatial locations
-    slt = sampling_loc_time(qoi_dim_names, qoi_dim)
-    for plane_ind in range(0,1):
-        pl = plane[plane_ind]
-        if pl=='xy':
-            plane_cols, plane_rows = np.meshgrid(wrf_domain6[qoi_dim_names[3]], wrf_domain6[qoi_dim_names[2]])
-            contourPlotSpaceTime(wrf_domain6, qoi_data, qoi, qoi_unit, qoi_dim_names[1],slt,plane_rows, plane_cols, pl, plot_loc, ref_time, dt)
-        elif pl=='yz':
-            plane_cols, plane_rows = np.meshgrid(wrf_domain6[qoi_dim_names[2]], wrf_domain6[qoi_dim_names[1]])
-            contourPlotSpaceTime(wrf_domain6, qoi_data, qoi, qoi_unit, qoi_dim_names[3],slt,plane_rows, plane_cols, pl, plot_loc, ref_time, dt)
-        elif pl=='xz':
-            plane_cols, plane_rows = np.meshgrid(wrf_domain6[qoi_dim_names[3]], wrf_domain6[qoi_dim_names[1]])
-            contourPlotSpaceTime(wrf_domain6, qoi_data, qoi, qoi_unit, qoi_dim_names[2],slt,plane_rows, plane_cols, pl, plot_loc, ref_time, dt)
-    '''
-    
-    # In[]  
-    '''
-    pl = 'xy'
-    vert_loc = [20, 25]
-    plane_cols, plane_rows = np.meshgrid(wrf_domain6[qoi_dim_names[3]], wrf_domain6[qoi_dim_names[2]])
-    contourPlotInstantaneous(wrf_domain6, qoi_data, qoi, qoi_unit, qoi_dim_names[1], vert_loc, plane_rows, plane_cols, pl, plot_loc, ref_time, dt)
-    '''
-    
-    # In[]  
-    '''
-    pl = 'xy'
-    vert_loc = [20]
-    plane_cols, plane_rows = np.meshgrid(wrf_domain6[qoi_dim_names[3]], wrf_domain6[qoi_dim_names[2]])
-    contourPlotTimeAvg(wrf_domain6, qoi_data, qoi, qoi_unit, qoi_dim_names[1], vert_loc, plane_rows, plane_cols, pl, plot_loc, ref_time, dt)
-    '''
-    
-    # In[]
-    '''
-    [we_ind, sn_ind] = [300, 300]
-    linePlotTimeAvg(wrf_domain6, qoi_data, qoi, qoi_unit, we_ind, sn_ind, plot_loc, ref_time, dt)
-    '''
-    
-    # In[]
     
 # In[]
 dummy = 0

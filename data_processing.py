@@ -50,7 +50,7 @@ def get_power_data(nc_data):
     return power_ts, power_avg
 
 # In[]
-def get_z_slices_instantaneous(nc_data, qoi_units_map, z_plane_locs, ref_time, dt, start_time, frac_time):
+def get_z_slices_instantaneous(nc_data, qoi_from_tsout_file, z_plane_locs, ref_time, dt, start_time, frac_time):
     z_slices_instantaneous = {}
     
     n_time_stamps = nc_data.dims['Time']
@@ -66,7 +66,7 @@ def get_z_slices_instantaneous(nc_data, qoi_units_map, z_plane_locs, ref_time, d
    
     
     # In[] Read all the relevant data from the NetCDF file
-    for qoi in qoi_units_map.keys():
+    for qoi in qoi_from_tsout_file:
         qoi_data = nc_data[qoi]
         if qoi == 'WTS' or qoi == 'ZTS':
             bottom_top_dim = 'bottom_top_stag'
@@ -191,7 +191,7 @@ def get_z_slices_time_averaged(nc_data, qoi_list, z_plane_locs, ref_time, dt, st
     return z_slices_time_averaged
 
 # In[]
-def create_data (nc_data, qoi_units_map, z_plane_locs, vert_line_locs, ref_time, dt, start_time, frac_time):
+def create_data (nc_data, qoi_from_tsout_file, z_plane_locs, vert_line_locs, ref_time, dt, start_time, frac_time):
     pickled_data = {}
     
     # In[] Start time stamp to identify the beginning of a data set 
@@ -214,7 +214,7 @@ def create_data (nc_data, qoi_units_map, z_plane_locs, vert_line_locs, ref_time,
     pickled_data['power_inst'], pickled_data['power_avg'] = get_power_data(nc_data)
     
     # In[]
-    pickled_data['z_slices_instantaneous'], pickled_data['z_slices_time_avg'] = get_z_slices_instantaneous(nc_data, qoi_units_map, z_plane_locs, ref_time, dt, start_time, frac_time)
+    pickled_data['z_slices_instantaneous'], pickled_data['z_slices_time_avg'] = get_z_slices_instantaneous(nc_data, qoi_from_tsout_file, z_plane_locs, ref_time, dt, start_time, frac_time)
     
     # In[]
     return pickled_data

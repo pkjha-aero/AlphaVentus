@@ -31,16 +31,8 @@ sim_start_time = timer()
 
 # In[]:
 # Variables of interest
-plane = ['xy','yz','xz']
 
-qoi_units_map = {'UTS': 'm/s',
-                 'VTS': 'm/s',
-                 'WTS': 'm/s',
-                 'TKETS': 'm2/s2'
-                }
-qoi_list = list(qoi_units_map.keys())
-#qoi_list = ['UTS']
-qoi_units = list(qoi_units_map.values())
+qoi_from_tsout_file = ['UTS','VTS', 'WTS', 'TKETS']
 
 qoi_plot_map = {'UMAG': 'm/s',
                 'TKE_RES': 'm2/s2',
@@ -63,7 +55,7 @@ qoi_range_map = {'UMAG'    : [8.0, 20.0],
                  'TKE_SGS_AVG' : [0.0, 0.6],
                  'W'       : [-1.35, 1.35],
                  'W_AVG'   : [-1.35, 1.35]
-    }
+                }
 
 # In[]:
 interval_tsoutfile_map = {'part05': '2010-05-16_00:00:10'
