@@ -118,36 +118,40 @@ for interval, tsout_file_stamp in interval_tsoutfile_map.items():
     start_time = datetime.fromisoformat(tsout_time[-2]+ '_' + tsout_time[-1]) - timedelta(seconds = dt)
     start_time_stamp = start_time.isoformat('_') #.split('_')[1]
     
-    # Processed data location for this interval
-    processed_slice_interval_loc = os.path.join(processed_slice_case_loc, '{}_procfiles'.format(interval))
-    
-    # pickle file name
-    pickled_slice_interval_file_name = '{}_slice_{}.pkl'.format(interval, start_time_stamp)
-    pickled_slice_interval_file = os.path.join(processed_slice_interval_loc, pickled_slice_interval_file_name)
-    #'''
     # Open tsout NetCDF data
     tsout_interval_domain6 = xr.open_dataset(netCDF_file_for_interval)
     
-    # Create pickled data
-    pickled_slice_data_interval = create_slice_data (tsout_interval_domain6, qoi_from_tsout_file, z_plane_locs, vert_line_locs, tsout_time, dt, start_time, frac_time)
+    if extract_slice_data or plot_slice_data:
+        # Processed slice data location for this interval
+        processed_slice_interval_loc = os.path.join(processed_slice_case_loc, '{}_procfiles'.format(interval))
+        
+        # Pickle file name for processed slice data
+        pickled_slice_interval_file_name = '{}_slice_{}.pkl'.format(interval, start_time_stamp)
+        pickled_slice_interval_file = os.path.join(processed_slice_interval_loc, pickled_slice_interval_file_name)
     
-    # Write picked data
-    os.system('mkdir -p %s'%processed_slice_interval_loc)
-    with open(pickled_slice_interval_file, 'wb') as pickled_slice_interval_file_handle:
-        pickle.dump(pickled_slice_data_interval, pickled_slice_interval_file_handle)
-    #'''
+    if extract_slice_data:
+        # Create pickled data
+        pickled_slice_data_interval = create_slice_data (tsout_interval_domain6, qoi_from_tsout_file, z_plane_locs, vert_line_locs, tsout_time, dt, start_time, frac_time)
+        
+        # Write picked data
+        os.system('mkdir -p %s'%processed_slice_interval_loc)
+        with open(pickled_slice_interval_file, 'wb') as pickled_slice_interval_file_handle:
+            pickle.dump(pickled_slice_data_interval, pickled_slice_interval_file_handle)
+ 
     '''
     # Plot Line Plot of instantaneous and avg power
     plot_power_inst (pickle_file_loc, proc_data_loc, case_name, dt)
     plot_power_avg (pickle_file_loc, proc_data_loc, case_name)
     '''
-    # Plot contour plots of instantaneous data
-    plot_contours_instantaneous(pickled_slice_interval_file, processed_slice_interval_loc, qoi_plot_map, qoi_range_map, [250, 350], [250, 350])
-    plot_contours_instantaneous(pickled_slice_interval_file, processed_slice_interval_loc, qoi_plot_map, qoi_range_map)
     
-    # Plot contour plots of averaged data
-    plot_contours_time_avg(pickled_slice_interval_file, processed_slice_interval_loc, qoi_plot_avg_map, qoi_range_map, [250, 350], [250, 350])
-    plot_contours_time_avg(pickled_slice_interval_file, processed_slice_interval_loc, qoi_plot_avg_map, qoi_range_map)
+    if plot_slice_data:
+        # Plot contour plots of instantaneous data
+        plot_contours_instantaneous(pickled_slice_interval_file, processed_slice_interval_loc, qoi_plot_map, qoi_range_map, [250, 350], [250, 350])
+        plot_contours_instantaneous(pickled_slice_interval_file, processed_slice_interval_loc, qoi_plot_map, qoi_range_map)
+        
+        # Plot contour plots of averaged data
+        plot_contours_time_avg(pickled_slice_interval_file, processed_slice_interval_loc, qoi_plot_avg_map, qoi_range_map, [250, 350], [250, 350])
+        plot_contours_time_avg(pickled_slice_interval_file, processed_slice_interval_loc, qoi_plot_avg_map, qoi_range_map)
 
 # In[]
 sim_end_time = timer()
