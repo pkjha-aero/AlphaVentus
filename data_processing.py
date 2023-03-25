@@ -60,15 +60,14 @@ def get_z_slices_instantaneous(nc_data, qoi_from_tsout_file, z_plane_locs, ref_t
     
     # In[]
     # In[]
-    qoi_list = ['UTS', 'VTS', 'WTS']
-    #qoi_list = ['UTS']
+    qoi_list = ['UTS', 'VTS', 'WTS', 'T13TS', 'T23TS']
     z_slices_time_avg = get_z_slices_time_averaged(nc_data, qoi_list, z_plane_locs, ref_time, dt, start_time, frac_time)
    
     
     # In[] Read all the relevant data from the NetCDF file
     for qoi in qoi_from_tsout_file:
         qoi_data = nc_data[qoi]
-        if qoi == 'WTS' or qoi == 'ZTS':
+        if qoi in ['WTS', 'ZTS', 'T13TS', 'T23TS']:
             bottom_top_dim = 'bottom_top_stag'
         else:
             bottom_top_dim = 'bottom_top'
@@ -83,7 +82,7 @@ def get_z_slices_instantaneous(nc_data, qoi_from_tsout_file, z_plane_locs, ref_t
                 axes_name = arr.dims
                 z_slice_t.append(np.array(arr))
             z_slice_data[qoi].append(z_slice_t)
-     
+
     # In[] Get U magnitude
     z_slice_data['UMAG'] = []        
     for time_count in range(int(frac_time*n_time_stamps)):
@@ -111,6 +110,8 @@ def get_z_slices_instantaneous(nc_data, qoi_from_tsout_file, z_plane_locs, ref_t
             z_slice_space['W'] = z_slice_data['WTS'][time_count][space_count]
             z_slice_space['UMAG'] = z_slice_data['UMAG'][time_count][space_count]
             z_slice_space['TKE_SGS'] = z_slice_data['TKETS'][time_count][space_count]
+            z_slice_space['T23'] = z_slice_data['T23TS'][time_count][space_count]
+            z_slice_space['T13'] = z_slice_data['T13TS'][time_count][space_count]
             
             z_slice_space['UP'] = z_slice_space['U'] - z_slices_time_avg[start_time.isoformat('_')][z_plane_locs[space_count]]['U_AVG']
             z_slice_space['VP'] = z_slice_space['V'] - z_slices_time_avg[start_time.isoformat('_')][z_plane_locs[space_count]]['V_AVG']
@@ -156,7 +157,7 @@ def get_z_slices_time_averaged(nc_data, qoi_list, z_plane_locs, ref_time, dt, st
     # In[] Read all the relevant data from the NetCDF file
     for qoi in qoi_list:
         qoi_data = nc_data[qoi]
-        if qoi == 'WTS' or qoi == 'ZTS':
+        if qoi in ['WTS', 'ZTS', 'T13TS', 'T23TS']:
             bottom_top_dim = 'bottom_top_stag'
         else:
             bottom_top_dim = 'bottom_top'
@@ -182,6 +183,8 @@ def get_z_slices_time_averaged(nc_data, qoi_list, z_plane_locs, ref_time, dt, st
         z_slice_space['U_AVG'] = z_slice_data['UTS'][time_count][space_count]
         z_slice_space['V_AVG'] = z_slice_data['VTS'][time_count][space_count]
         z_slice_space['W_AVG'] = z_slice_data['WTS'][time_count][space_count]
+        z_slice_space['T23_AVG'] = z_slice_data['T23TS'][time_count][space_count]
+        z_slice_space['T13_AVG'] = z_slice_data['T13TS'][time_count][space_count]
 
         z_slice_time[z_plane_locs[space_count]] = z_slice_space
     

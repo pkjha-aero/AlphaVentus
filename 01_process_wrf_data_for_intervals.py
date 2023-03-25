@@ -31,25 +31,29 @@ sim_start_time = timer()
 # In[]:
 # Variables of interest
 
-qoi_from_tsout_file = ['UTS','VTS', 'WTS', 'TKETS']
+qoi_from_tsout_file = ['UTS','VTS', 'WTS', 'TKETS', 'T13TS', 'T23TS']
 
 qoi_plot_map = {'UMAG': 'm/s',
                 'TKE_RES': 'm2/s2',
                 'TKE_SGS': 'm2/s2',
                 'TKE_TOT': 'm2/s2',
+                'T23': 'm2/s2',
+                'T13': 'm2/s2',
                 'W'   : 'm/s'
                }
 
-qoi_plot_map = {'UMAG': 'm/s'}
+#qoi_plot_map = {'UMAG': 'm/s'}
 
 qoi_plot_avg_map = {'UMAG_AVG': 'm/s',
                     'TKE_RES_AVG': 'm2/s2',
                     'TKE_SGS_AVG': 'm2/s2',
                     'TKE_TOT_AVG': 'm2/s2',
+                    'T23_AVG': 'm2/s2',
+                    'T13_AVG': 'm2/s2',
                     'W_AVG'   : 'm/s'
                    }
 
-qoi_plot_avg_map = {'UMAG_AVG': 'm/s'}
+#qoi_plot_avg_map = {'UMAG_AVG': 'm/s'}
 
 qoi_range_map = {'UMAG'    : [8.0, 15.0],
                  'UMAG_AVG': [8.0, 15.0],
@@ -75,7 +79,7 @@ interval_tsoutfile_map = {'part05': '2010-05-16_00:00:10',
                           'part12': '2010-05-16_01:10:10',
                           'part13': '2010-05-16_01:20:10',
                           'part14': '2010-05-16_01:30:10',
-                          'part15': '2010-05-16_01:40:10'
+                          'part15': '2010-05-16_01:40:10',
                           'part16': '2010-05-16_01:50:10'
     }
 '''
@@ -87,15 +91,15 @@ vert_line_locs = [1] #D
 
 dt = 10 # sec
 
-frac_time = 0.02 # Fraction of time series to use
+frac_time = 0.04 # Fraction of time series to use
 #frac_time = 1.00 # Fraction of time series to use
 
 # In[]
 # Flags etc.
-extract_slice_data = False
-extract_power_data = True
-plot_slice_data = False
-plot_power_data = True
+extract_slice_data = True
+extract_power_data = False
+plot_slice_data = True
+plot_power_data = False
 
 # In[]:
 case_name = 'MesoMicro1_CPM'
@@ -145,11 +149,11 @@ for interval, tsout_file_stamp in interval_tsoutfile_map.items():
     if plot_slice_data:
         # Plot contour plots of instantaneous data
         plot_contours_instantaneous(pickled_slice_interval_file, processed_slice_interval_loc, qoi_plot_map, qoi_range_map, [250, 350], [250, 350])
-        plot_contours_instantaneous(pickled_slice_interval_file, processed_slice_interval_loc, qoi_plot_map, qoi_range_map)
+        #plot_contours_instantaneous(pickled_slice_interval_file, processed_slice_interval_loc, qoi_plot_map, qoi_range_map)
         
         # Plot contour plots of averaged data
         plot_contours_time_avg(pickled_slice_interval_file, processed_slice_interval_loc, qoi_plot_avg_map, qoi_range_map, [250, 350], [250, 350])
-        plot_contours_time_avg(pickled_slice_interval_file, processed_slice_interval_loc, qoi_plot_avg_map, qoi_range_map)
+        #plot_contours_time_avg(pickled_slice_interval_file, processed_slice_interval_loc, qoi_plot_avg_map, qoi_range_map)
         
     # In[]    
     if extract_power_data or plot_power_data:
