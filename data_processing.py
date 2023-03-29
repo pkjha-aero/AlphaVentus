@@ -61,6 +61,8 @@ def get_z_slices_instantaneous(nc_data, qoi_from_tsout_file, z_plane_locs, ref_t
     # In[]
     # In[]
     qoi_list = ['UTS', 'VTS', 'WTS', 'T13TS', 'T23TS']
+    #qoi_list = ['UTS', 'VTS']
+    #qoi_from_tsout_file = qoi_list
     z_slices_time_avg = get_z_slices_time_averaged(nc_data, qoi_list, z_plane_locs, ref_time, dt, start_time, frac_time)
    
     
@@ -125,21 +127,26 @@ def get_z_slices_instantaneous(nc_data, qoi_from_tsout_file, z_plane_locs, ref_t
             
     # In[]
     for qoi in ['UMAG', 'TKE_RES', 'TKE_SGS', 'TKE_TOT']:
-        space_avg = {}
+    #for qoi in ['UMAG']:
+        timestamp_key = list(z_slices_instantaneous)[0]
+        zloc_key = list(z_slices_instantaneous[timestamp_key])[0]
+        space_dim = z_slices_instantaneous[timestamp_key][zloc_key]['UMAG'].shape
+        space_avg_zloc = np.zeros((n_zloc, space_dim[0], space_dim[1]))
+        
         for time_count, time_stamp in enumerate(z_slices_instantaneous.keys()):
             current_time_stamp = time_stamp.split('_')[1]
         
-            for space_count, zloc in enumerate(z_slices_instantaneous[time_stamp]):
+            for space_count, zloc in enumerate(z_slices_instantaneous[time_stamp]): 
                 z_slice_space = z_slices_instantaneous[time_stamp][zloc]
                 space = z_slice_space[qoi]
                 if time_count == 0:
-                    space_avg[zloc] = space
+                    space_avg_zloc[space_count] = space
                 else:
-                    space_avg[zloc] += space
+                    space_avg_zloc[space_count] += space
          
-        for space_count, zloc in enumerate(space_avg.keys()):
-            space = space_avg[zloc]/len(z_slices_instantaneous.keys())
-            z_slices_time_avg[start_time.isoformat('_')][z_plane_locs[space_count]][qoi + '_AVG'] = space
+        for space_count in range(space_avg_zloc.shape[0]):
+            space_avg = space_avg_zloc[space_count]/len(z_slices_instantaneous.keys())
+            z_slices_time_avg[start_time.isoformat('_')][z_plane_locs[space_count]][qoi + '_AVG'] = space_avg
             
     # In[]
     return z_slices_instantaneous, z_slices_time_avg
