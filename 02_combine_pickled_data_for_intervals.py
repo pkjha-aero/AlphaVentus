@@ -38,6 +38,8 @@ qoi_plot_map = {'UMAG': 'm/s',
                 'TKE_RES': 'm2/s2',
                 'TKE_SGS': 'm2/s2',
                 'TKE_TOT': 'm2/s2',
+                'T23': 'm2/s2',
+                'T13': 'm2/s2',
                 'W'   : 'm/s'
                }
 qoi_plot_avg_map = {'UMAG_AVG': 'm/s',
@@ -71,7 +73,8 @@ interval_tsoutfile_map = {'part05': '2010-05-16_00:00:10',
                           'part12': '2010-05-16_01:10:10',
                           'part13': '2010-05-16_01:20:10',
                           'part14': '2010-05-16_01:30:10',
-                          'part15': '2010-05-16_01:40:10'
+                          'part15': '2010-05-16_01:40:10',
+                          'part16': '2010-05-16_01:50:10'
     }
 #'''
     
@@ -82,19 +85,38 @@ vert_line_locs = [1] #D
 
 dt = 10 # sec
 
-frac_time = 0.02 # Fraction of time series to use
-frac_time = 1.00 # Fraction of time series to use
+#frac_time = 0.02 # Fraction of time series to use
+#frac_time = 1.00 # Fraction of time series to use
+
+# In[]:
+# Flags etc.
+combine_slice_for_intervals = True
+plot_slice_combined_intervals = True
+
+combine_power_for_intervals = True
+scale_power_for_intervals = False
+plot_power_combined_intervals = True
 
 # In[]:
 case_name = 'MesoMicro1_CPM'
-processed_results_loc_base = '/Users/jha3/Downloads/AlphaVentusProcessed_PowerOnly'
-processed_results_loc = os.path.join(processed_results_loc_base, case_name)
-proc_data_loc_for_combined = os.path.join(processed_results_loc, 'combined_procfiles')
- 
-# pickle file for combined
-pickle_file_name_for_combined = '{}_pickled.pkl'.format('combined_data')
-pickle_file_loc_for_combined = os.path.join(proc_data_loc_for_combined, pickle_file_name_for_combined)
-pickled_data_combined = {}
+
+# Path where processed data for intervals and combined data are located
+processed_slice_base_loc = '/Users/jha3/Downloads/AlphaVentus_Slice'
+processed_slice_case_loc = os.path.join(processed_slice_base_loc, case_name)
+
+processed_power_base_loc = '/Users/jha3/Downloads/AlphaVentus_Power'
+processed_power_case_loc = os.path.join(processed_power_base_loc, case_name)
+
+# In[]:
+if combine_slice_for_intervals or plot_slice_combined_intervals:
+    combined_slice_data = {}
+    combined_slice_data_loc = os.path.join(processed_slice_case_loc, 'combined_procfiles')
+    combined_slice_pickle_file = os.path.join(combined_slice_data_loc, '{}_combined_slice.pkl'.format(case_name))
+
+if combine_power_for_intervals or plot_power_combined_intervals:
+    combined_power_data = {}
+    combined_power_data_loc = os.path.join(processed_power_case_loc, 'combined_procfiles')
+    combined_power_pickle_file = os.path.join(combined_power_data_loc, '{}_combined_power.pkl'.format(case_name))
 
 # In[]
 for interval, tsout_file_stamp in interval_tsoutfile_map.items():   
@@ -102,88 +124,51 @@ for interval, tsout_file_stamp in interval_tsoutfile_map.items():
     tsout_time = tsout_file_stamp.split('_')
     start_time = datetime.fromisoformat(tsout_time[-2]+ '_' + tsout_time[-1]) - timedelta(seconds = dt)
     start_time_stamp = start_time.isoformat('_') #.split('_')[1]
-    
-    # Processed data location for this interval
-    proc_data_loc_for_interval = os.path.join(processed_results_loc, '{}_procfiles'.format(interval))
    
-    # pickle file for interval
-    pickle_file_name_for_interval = '{}_pickled_{}.pkl'.format(interval, start_time_stamp)
-    pickle_file_loc_for_interval = os.path.join(proc_data_loc_for_interval, pickle_file_name_for_interval)
+    # In[]:
+    if combine_slice_for_intervals:
+        # Processed slice data location for this interval
+        processed_slice_interval_loc = os.path.join(processed_slice_case_loc, '{}_procfiles'.format(interval))
+        
+        # Pickle file name for processed slice data
+        pickled_slice_interval_file_name = '{}_slice_{}.pkl'.format(interval, start_time_stamp)
+        pickled_slice_interval_file = os.path.join(processed_slice_interval_loc, pickled_slice_interval_file_name)
     
-    # Open pickled data for the interval
-    with open(pickle_file_loc_for_interval, 'rb') as pickle_file_handle:
-        pickled_data_for_interval = pickle.load(pickle_file_handle)
+    # In[]:
+    if combine_power_for_intervals:
+        # Processed slice data location for this interval
+        processed_power_interval_loc = os.path.join(processed_power_case_loc, '{}_procfiles'.format(interval))
+        
+        # Pickle file name for processed power data
+        pickled_power_interval_file_name = '{}_power_{}.pkl'.format(interval, start_time_stamp)
+        pickled_power_interval_file = os.path.join(processed_power_interval_loc, pickled_power_interval_file_name)
     
-    # Combine the picked data for intervals
-    pickled_data_combined = combine_power_for_intervals(pickled_data_combined, pickled_data_for_interval)
+        # Open pickled data for the interval
+        with open(pickled_power_interval_file, 'rb') as pickled_power_interval_file_handle:
+            pickled_power_data_interval = pickle.load(pickled_power_interval_file_handle)
+            
+        # Scale power data if desired
+        if scale_power_for_intervals:
+            pickled_power_data_interval = pickled_power_data_interval
     
-
+        # Combine the picked data for intervals
+        combined_power_data = combine_power_for_intervals_of_case(combined_power_data, pickled_power_data_interval)
+    
 # In[]
 # Write the combined pickled data
-os.system('mkdir -p %s'%proc_data_loc_for_combined)
-with open(pickle_file_loc_for_combined, 'wb') as pickle_file_handle:
-    pickle.dump(pickled_data_combined, pickle_file_handle)
-
-# In[]    
-plot_power_inst (pickle_file_loc_for_combined, proc_data_loc_for_combined, case_name, dt)
-plot_power_avg (pickle_file_loc_for_combined, proc_data_loc_for_combined, case_name)
-plot_power_histogram (pickle_file_loc_for_combined, proc_data_loc_for_combined, case_name, num_bins = 30)
-    
+if combine_power_for_intervals:
+    os.system('mkdir -p %s'%combined_power_data_loc)
+    with open(combined_power_pickle_file, 'wb') as combined_power_pickle_file_handle:
+        pickle.dump(combined_power_data, combined_power_pickle_file_handle)
 # In[]
-# Open the combined pickled data saved above
-'''
-with open(pickle_file_loc_for_combined, 'rb') as pickle_file_handle:
-    pickled_data_combined_read = pickle.load(pickle_file_handle)
-'''
+if plot_power_combined_intervals:
+     plot_power_inst(combined_power_pickle_file, combined_power_data_loc, case_name, dt)
+     plot_power_histogram(combined_power_pickle_file, combined_power_data_loc, case_name, num_bins = 30)
+     plot_power_avg(combined_power_pickle_file, combined_power_data_loc, case_name)
+    
 # In[]
 sim_end_time = timer()
 print('Total computing time: {} s'.format(sim_end_time - sim_start_time))
 
-# In[]
-
-# Loop over QoI of interest to create plots
-for (qoi, qoi_unit) in zip(qoi_list, qoi_units):
-    #qoi_data, qoi_dim_names, qoi_dim = getQoI(tsout_domain6, qoi)
-    # In[]    
-    '''
-    # Plot contours at the desired times and spatial locations
-    slt = sampling_loc_time(qoi_dim_names, qoi_dim)
-    for plane_ind in range(0,1):
-        pl = plane[plane_ind]
-        if pl=='xy':
-            plane_cols, plane_rows = np.meshgrid(wrf_domain6[qoi_dim_names[3]], wrf_domain6[qoi_dim_names[2]])
-            contourPlotSpaceTime(wrf_domain6, qoi_data, qoi, qoi_unit, qoi_dim_names[1],slt,plane_rows, plane_cols, pl, plot_loc, ref_time, dt)
-        elif pl=='yz':
-            plane_cols, plane_rows = np.meshgrid(wrf_domain6[qoi_dim_names[2]], wrf_domain6[qoi_dim_names[1]])
-            contourPlotSpaceTime(wrf_domain6, qoi_data, qoi, qoi_unit, qoi_dim_names[3],slt,plane_rows, plane_cols, pl, plot_loc, ref_time, dt)
-        elif pl=='xz':
-            plane_cols, plane_rows = np.meshgrid(wrf_domain6[qoi_dim_names[3]], wrf_domain6[qoi_dim_names[1]])
-            contourPlotSpaceTime(wrf_domain6, qoi_data, qoi, qoi_unit, qoi_dim_names[2],slt,plane_rows, plane_cols, pl, plot_loc, ref_time, dt)
-    '''
-    
-    # In[]  
-    '''
-    pl = 'xy'
-    vert_loc = [20, 25]
-    plane_cols, plane_rows = np.meshgrid(wrf_domain6[qoi_dim_names[3]], wrf_domain6[qoi_dim_names[2]])
-    contourPlotInstantaneous(wrf_domain6, qoi_data, qoi, qoi_unit, qoi_dim_names[1], vert_loc, plane_rows, plane_cols, pl, plot_loc, ref_time, dt)
-    '''
-    
-    # In[]  
-    '''
-    pl = 'xy'
-    vert_loc = [20]
-    plane_cols, plane_rows = np.meshgrid(wrf_domain6[qoi_dim_names[3]], wrf_domain6[qoi_dim_names[2]])
-    contourPlotTimeAvg(wrf_domain6, qoi_data, qoi, qoi_unit, qoi_dim_names[1], vert_loc, plane_rows, plane_cols, pl, plot_loc, ref_time, dt)
-    '''
-    
-    # In[]
-    '''
-    [we_ind, sn_ind] = [300, 300]
-    linePlotTimeAvg(wrf_domain6, qoi_data, qoi, qoi_unit, we_ind, sn_ind, plot_loc, ref_time, dt)
-    '''
-    
-    # In[]
-    
 # In[]
 dummy = 0

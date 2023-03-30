@@ -12,7 +12,7 @@ import json
 from datetime import date, datetime, timedelta, time
 
 # In[]:
-def combine_power_for_intervals(pickled_data_combined, pickled_data_for_interval):
+def combine_power_for_intervals_of_case(pickled_data_combined, pickled_data_for_interval):
     power_avg_key = 'power_avg'
     power_inst_key = 'power_inst'
     

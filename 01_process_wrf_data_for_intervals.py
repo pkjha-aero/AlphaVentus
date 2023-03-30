@@ -157,10 +157,10 @@ for interval, tsout_file_stamp in interval_tsoutfile_map.items():
         
     # In[]    
     if extract_power_data or plot_power_data:
-        # Processed slice data location for this interval
+        # Processed power data location for this interval
         processed_power_interval_loc = os.path.join(processed_power_case_loc, '{}_procfiles'.format(interval))
         
-        # Pickle file name for processed slice data
+        # Pickle file name for processed power data
         pickled_power_interval_file_name = '{}_power_{}.pkl'.format(interval, start_time_stamp)
         pickled_power_interval_file = os.path.join(processed_power_interval_loc, pickled_power_interval_file_name)
         
