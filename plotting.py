@@ -22,10 +22,14 @@ def plot_power_inst (pickle_file_name, plot_loc, case_name, dt, ylim=None):
         pickled_data_read = pickle.load(pickle_file_handle)
         
     plt.figure()
-    plt.plot(pickled_data_read['power_inst']/1.0e6)
+    time_sec = np.arange(len(pickled_data_read['power_inst']))*dt
+    time_min = time_sec/60.0
+    plt.plot(time_min, pickled_data_read['power_inst']/1.0e6)
 
-    plt.xlabel('Time Index', fontsize=14)
+    plt.xlabel('Time [Min]', fontsize=14)
     plt.ylabel('Power [MW]', fontsize=14)
+    if ylim:
+        plt.ylim([ylim[0],ylim[1]])
     plt.tick_params(axis='x', labelsize=14)
     plt.tick_params(axis='y', labelsize=14)
     plt.title('Time series of power', fontsize=14)
@@ -35,24 +39,29 @@ def plot_power_inst (pickle_file_name, plot_loc, case_name, dt, ylim=None):
     os.system('mkdir -p %s'%filedir)
     plt.savefig(os.path.join(filedir, filename), bbox_inches='tight')
     plt.close()
-    
+     
 
 # In[]
-def plot_power_histogram (pickle_file_name, plot_loc, case_name, num_bins = 20):
+def plot_power_pdf (pickle_file_name, plot_loc, case_name, num_bins = 20, xlim = None, ylim = None):
     # In[] Read the pickle data
     with open(pickle_file_name, 'rb') as pickle_file_handle:
         pickled_data_read = pickle.load(pickle_file_handle)
         
     plt.figure()
-    plt.hist(pickled_data_read['power_inst']/1.0e6, num_bins, density=1, color = 'green', alpha = 0.7)
+    plt.bar(pickled_data_read['bin_centers'], pickled_data_read['hist'], color = 'lime')
+    plt.plot(pickled_data_read['bin_centers'], pickled_data_read['hist'], color = 'k')
 
-    plt.ylabel('Freq', fontsize=14)
+    plt.ylabel('PDF of power[1/MW]', fontsize=14)
     plt.xlabel('Power [MW]', fontsize=14)
+    if xlim:
+        plt.xlim([xlim[0],xlim[1]])
+    if ylim:
+        plt.ylim([ylim[0],ylim[1]])
     plt.tick_params(axis='x', labelsize=14)
     plt.tick_params(axis='y', labelsize=14)
-    plt.title('Histogram of power', fontsize=14)
+    plt.title('Probability density function (PDF) of power', fontsize=14)
 
-    filename = 'Power_Hist_{}.png'.format(case_name)
+    filename = 'Power_PDF_{}.png'.format(case_name)
     filedir = os.path.join(plot_loc, 'Instantaneous', 'Power')
     os.system('mkdir -p %s'%filedir)
     plt.savefig(os.path.join(filedir, filename), bbox_inches='tight')
