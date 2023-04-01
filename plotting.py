@@ -34,7 +34,10 @@ def plot_power_inst (pickle_file_name, plot_loc, case_name, dt, ylim=None):
     plt.tick_params(axis='y', labelsize=14)
     plt.title('Time series of power', fontsize=14)
 
-    filename = 'Power_TS_{}.png'.format(case_name)
+    if ylim:
+        filename = 'Power_TS_{}_Bounded.png'.format(case_name)
+    else:
+        filename = 'Power_TS_{}_Unbounded.png'.format(case_name)
     filedir = os.path.join(plot_loc, 'Instantaneous', 'Power')
     os.system('mkdir -p %s'%filedir)
     plt.savefig(os.path.join(filedir, filename), bbox_inches='tight')
@@ -61,7 +64,10 @@ def plot_power_pdf (pickle_file_name, plot_loc, case_name, num_bins = 20, xlim =
     plt.tick_params(axis='y', labelsize=14)
     plt.title('Probability density function (PDF) of power', fontsize=14)
 
-    filename = 'Power_PDF_{}.png'.format(case_name)
+    if xlim or ylim:
+        filename = 'Power_PDF_{}_Bounded.png'.format(case_name)
+    else:
+        filename = 'Power_PDF_{}_Unbounded.png'.format(case_name)
     filedir = os.path.join(plot_loc, 'Instantaneous', 'Power')
     os.system('mkdir -p %s'%filedir)
     plt.savefig(os.path.join(filedir, filename), bbox_inches='tight')
@@ -88,6 +94,10 @@ def plot_power_avg (pickle_file_name, plot_loc, case_name, ylim=None):
     plt.tick_params(axis='y', labelsize=14)
     plt.title('Average power over 10-min', fontsize=14)
 
+    if ylim:
+        filename = 'Power_TimeAvg_{}_Bounded.png'.format(case_name)
+    else:
+        filename = 'Power_TimeAvg_{}_Unbounded.png'.format(case_name)
     filename = 'Power_TimeAvg_{}.png'.format(case_name)
     filedir = os.path.join(plot_loc, 'TimeAvg', 'Power_Avg')
     os.system('mkdir -p %s'%filedir)

@@ -169,9 +169,12 @@ if combine_power_for_intervals:
         pickle.dump(combined_power_data, combined_power_pickle_file_handle)
 # In[]
 if plot_power_combined_intervals:
-     plot_power_inst(combined_power_pickle_file, combined_power_data_loc, case_name, dt, [2, 8])
-     plot_power_pdf(combined_power_pickle_file, combined_power_data_loc, case_name, 30, [2, 8], [0, 0.5])
-     plot_power_avg(combined_power_pickle_file, combined_power_data_loc, case_name, [3.5, 5.5])
+    plot_power_inst(combined_power_pickle_file, combined_power_data_loc, case_name, dt)
+    plot_power_inst(combined_power_pickle_file, combined_power_data_loc, case_name, dt, [2, 8])
+    plot_power_pdf(combined_power_pickle_file, combined_power_data_loc, case_name, 30)
+    plot_power_pdf(combined_power_pickle_file, combined_power_data_loc, case_name, 30, [2, 8], [0, 0.5])
+    plot_power_avg(combined_power_pickle_file, combined_power_data_loc, case_name)
+    plot_power_avg(combined_power_pickle_file, combined_power_data_loc, case_name, [3.5, 5.5])
     
 # In[]
 sim_end_time = timer()
