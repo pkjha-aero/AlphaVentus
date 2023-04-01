@@ -146,7 +146,6 @@ def plot_power_avg (pickle_file_name, plot_loc, case_name, ylim=None):
         filename = 'Power_TimeAvg_{}_Bounded.png'.format(case_name)
     else:
         filename = 'Power_TimeAvg_{}_Unbounded.png'.format(case_name)
-    filename = 'Power_TimeAvg_{}.png'.format(case_name)
     filedir = os.path.join(plot_loc, 'TimeAvg', 'Power_Avg')
     os.system('mkdir -p %s'%filedir)
     plt.savefig(os.path.join(filedir, filename), bbox_inches='tight')
