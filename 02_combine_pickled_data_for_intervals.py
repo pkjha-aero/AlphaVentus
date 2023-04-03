@@ -106,9 +106,12 @@ plot_power_stdev = True
 
 compute_power_pdf = True
 
+compute_power_spectra = True
+plot_power_spectra = True
+
 
 # In[]:
-case_name = 'MesoMicro1_NO_CPM'
+case_name = 'MesoMicro1_CPM'
 
 # Path where processed data for intervals and combined data are located
 processed_slice_base_loc = '/Users/jha3/Downloads/AlphaVentus_Slice'
@@ -168,6 +171,10 @@ for interval, tsout_file_stamp in interval_tsoutfile_map.items():
 if compute_power_pdf:
     combined_power_data = compute_power_pdf_combined (combined_power_data, num_bins=30)
     
+# In[]:
+if compute_power_spectra:
+    combined_power_data = compute_power_sprectra_combined(combined_power_data, sampling_freq = 1.0/dt, nperseg = 96)
+    
 # In[]
 # Write the combined pickled data
 if combine_power_for_intervals:
@@ -192,6 +199,9 @@ if plot_power_combined_intervals:
     
     if compute_power_stdev and plot_power_stdev:
         plot_power_stdev_combined(combined_power_pickle_file, combined_power_data_loc, case_name)
+        
+    if compute_power_spectra and plot_power_spectra:
+        plot_power_spectra_combined(combined_power_pickle_file, combined_power_data_loc, case_name)
     
 # In[]
 sim_end_time = timer()

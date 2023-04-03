@@ -123,6 +123,33 @@ def plot_power_inst_pdf (pickle_file_name, plot_loc, case_name, dt, num_bins = 2
 
 
 # In[]
+def plot_power_spectra_combined (pickle_file_name, plot_loc, case_name, xlim = None, ylim = None):
+    # In[] Read the pickle data
+    with open(pickle_file_name, 'rb') as pickle_file_handle:
+        pickled_data_read = pickle.load(pickle_file_handle)
+        
+    plt.figure()
+    plt.loglog(pickled_data_read['freq'], pickled_data_read['psd'])
+    plt.xlabel('Frequency [Hz]')
+    plt.ylabel('PSD [MW^2/Hz]')
+    if xlim:
+        plt.xlim([xlim[0],xlim[1]])
+    if ylim:
+        plt.ylim([ylim[0],ylim[1]])
+    plt.tick_params(axis='x', labelsize=14)
+    plt.tick_params(axis='y', labelsize=14)
+    plt.title('Power spectral density of turbine power', fontsize=14)
+
+    if xlim or ylim:
+        filename = 'Power_PSD_{}_Bounded.png'.format(case_name)
+    else:
+        filename = 'Power_PSD_{}_Unbounded.png'.format(case_name)
+    filedir = os.path.join(plot_loc, 'Instantaneous', 'Power')
+    os.system('mkdir -p %s'%filedir)
+    plt.savefig(os.path.join(filedir, filename), bbox_inches='tight')
+    plt.close()
+
+# In[]
 def plot_power_avg (pickle_file_name, plot_loc, case_name, ylim=None):
     # In[] Read the pickle data
     with open(pickle_file_name, 'rb') as pickle_file_handle:

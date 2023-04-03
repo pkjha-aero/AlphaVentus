@@ -11,6 +11,7 @@ import os
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib import gridspec
+from scipy import signal
 import json
 from datetime import date, datetime, timedelta, time
 
@@ -55,11 +56,11 @@ def combine_power_for_intervals_of_case(pickled_data_combined, pickled_data_for_
         
     # Append the stdev of power
     if compute_power_stdev:
-        powert_stdev_for_interval = np.std(pickled_data_for_interval[power_inst_key])
+        power_stdev_for_interval = np.std(pickled_data_for_interval[power_inst_key])
         if power_stdev_key not in pickled_data_combined:
-            pickled_data_combined[power_stdev_key] = powert_stdev_for_interval
+            pickled_data_combined[power_stdev_key] = power_stdev_for_interval
         else:
-            pickled_data_combined[power_stdev_key] = np.vstack((pickled_data_combined[power_stdev_key], powert_stdev_for_interval))
+            pickled_data_combined[power_stdev_key] = np.vstack((pickled_data_combined[power_stdev_key], power_stdev_for_interval))
     
     # Return the combined data
     return pickled_data_combined
@@ -76,3 +77,17 @@ def compute_power_pdf_combined (combined_power_data, num_bins = 20):
     combined_power_data['pdf_integral'] = np.sum(hist * np.diff(bin_edges))
      
     return combined_power_data
+
+# In[]:
+def compute_power_sprectra_combined (combined_power_data, sampling_freq, nperseg = 96):
+    power_inst_key = 'power_inst'
+    power_signal = combined_power_data[power_inst_key]/1.0e6
+    #(f, S) = signal.periodogram(power_signal.flatten(), sampling_freq, scaling='density')
+    (f, S) = signal.welch(power_signal.flatten(), sampling_freq, nperseg = nperseg)
+    #(S, f) = plt.psd(power_signal.flatten(), Fs = sampling_freq)
+    
+    combined_power_data['freq'] = f
+    combined_power_data['psd'] = S
+    
+    return combined_power_data
+    
