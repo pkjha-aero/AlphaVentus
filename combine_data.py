@@ -12,8 +12,9 @@ import json
 from datetime import date, datetime, timedelta, time
 
 # In[]:
-def combine_power_for_intervals_of_case(pickled_data_combined, pickled_data_for_interval):
+def combine_power_for_intervals_of_case(pickled_data_combined, pickled_data_for_interval, compute_power_stdev):
     power_avg_key = 'power_avg'
+    power_stdev_key = 'power_stdev'
     power_inst_key = 'power_inst'
     
     # Append the averaged power
@@ -27,6 +28,14 @@ def combine_power_for_intervals_of_case(pickled_data_combined, pickled_data_for_
         pickled_data_combined[power_inst_key] = pickled_data_for_interval[power_inst_key]
     else:
         pickled_data_combined[power_inst_key] = np.vstack((pickled_data_combined[power_inst_key], pickled_data_for_interval[power_inst_key]))
+        
+    # Append the stdev of power
+    if compute_power_stdev:
+        powert_stdev_for_interval = np.std(pickled_data_for_interval[power_inst_key])
+        if power_stdev_key not in pickled_data_combined:
+            pickled_data_combined[power_stdev_key] = powert_stdev_for_interval
+        else:
+            pickled_data_combined[power_stdev_key] = np.vstack((pickled_data_combined[power_stdev_key], powert_stdev_for_interval))
     
     # Return the combined data
     return pickled_data_combined

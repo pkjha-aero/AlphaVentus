@@ -93,12 +93,16 @@ dt = 10 # sec
 combine_slice_for_intervals = True
 plot_slice_combined_intervals = True
 
+# In[]
 combine_power_for_intervals = True
 scale_power_for_intervals = False
 plot_power_combined_intervals = True
 
-# In[]
+compute_power_stdev = True
+plot_power_stdev = True
+
 compute_power_pdf = True
+
 
 # In[]:
 case_name = 'MesoMicro1_CPM'
@@ -155,7 +159,7 @@ for interval, tsout_file_stamp in interval_tsoutfile_map.items():
             pickled_power_data_interval = pickled_power_data_interval
     
         # Combine the picked data for intervals
-        combined_power_data = combine_power_for_intervals_of_case(combined_power_data, pickled_power_data_interval)
+        combined_power_data = combine_power_for_intervals_of_case(combined_power_data, pickled_power_data_interval, compute_power_stdev)
  
 # In[]
 if compute_power_pdf:
@@ -182,6 +186,9 @@ if plot_power_combined_intervals:
     
     plot_power_avg(combined_power_pickle_file, combined_power_data_loc, case_name)
     plot_power_avg(combined_power_pickle_file, combined_power_data_loc, case_name, [3.5, 5.5])
+    
+    if compute_power_stdev and plot_power_stdev:
+        plot_power_stdev_combined(combined_power_pickle_file, combined_power_data_loc, case_name)
     
 # In[]
 sim_end_time = timer()

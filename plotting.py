@@ -151,6 +151,37 @@ def plot_power_avg (pickle_file_name, plot_loc, case_name, ylim=None):
     plt.savefig(os.path.join(filedir, filename), bbox_inches='tight')
     plt.close()
 
+
+# In[]
+def plot_power_stdev_combined (pickle_file_name, plot_loc, case_name, ylim=None):
+    # In[] Read the pickle data
+    with open(pickle_file_name, 'rb') as pickle_file_handle:
+        pickled_data_read = pickle.load(pickle_file_handle)
+        
+    power_stdev = pickled_data_read['power_stdev']
+    intervals = np.array(range(len(power_stdev))) + 1
+    plt.figure()
+    plt.bar(intervals, power_stdev.flatten()/1.0e6, width = 0.4)
+
+    plt.xlabel('Interval', fontsize=14)
+    plt.ylabel('Power [MW]', fontsize=14)
+    if ylim:
+        plt.ylim([ylim[0],ylim[1]])
+    plt.xticks(intervals)
+    plt.tick_params(axis='x', labelsize=14)
+    plt.tick_params(axis='y', labelsize=14)
+    plt.title('Std. deviation in power over 10-min', fontsize=14)
+
+    if ylim:
+        filename = 'Power_StDev_{}_Bounded.png'.format(case_name)
+    else:
+        filename = 'Power_StDev_{}_Unbounded.png'.format(case_name)
+    filedir = os.path.join(plot_loc, 'TimeAvg', 'Power_Avg')
+    os.system('mkdir -p %s'%filedir)
+    plt.savefig(os.path.join(filedir, filename), bbox_inches='tight')
+    plt.close()
+
+
 # In[]
 def plot_contours_instantaneous(pickle_file_name, plot_loc, qoi_plot_map, qoi_range_map, xlim=None, ylim=None):
     # In[] Read the pickle data
