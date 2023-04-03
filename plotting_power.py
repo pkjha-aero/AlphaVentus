@@ -9,6 +9,7 @@ Created on Sun Apr  2 19:14:28 2023
 # In[]
 import os
 import numpy as np
+import pandas as pd
 from matplotlib import pyplot as plt
 from matplotlib import gridspec
 import json
@@ -72,6 +73,40 @@ def plot_power_pdf (pickle_file_name, plot_loc, case_name, num_bins = 20, xlim =
     os.system('mkdir -p %s'%filedir)
     plt.savefig(os.path.join(filedir, filename), bbox_inches='tight')
     plt.close()
+    
+# In[]
+def plot_power_pdf_all_cases (pickle_file_name, plot_loc, case_colors, case_names, group_identifier, xlim = None, ylim = None):
+    # In[] Read the pickle data
+    with open(pickle_file_name, 'rb') as pickle_file_handle:
+        pickled_data_read = pickle.load(pickle_file_handle)
+     
+    plt.figure()
+    
+    colors = ['r', 'b', 'g', 'm']
+    for case_name  in case_names:
+        plt.plot(pickled_data_read[case_name]['bin_centers'], pickled_data_read[case_name]['hist'], color = case_colors[case_name], label=case_name)
+    
+    plt.ylabel('PDF of power [1/MW]', fontsize=14)
+    plt.xlabel('Power [MW]', fontsize=14)
+    if xlim:
+        plt.xlim([xlim[0],xlim[1]])
+    if ylim:
+        plt.ylim([ylim[0],ylim[1]])
+    plt.tick_params(axis='x', labelsize=14)
+    plt.tick_params(axis='y', labelsize=14)
+    plt.title('Probability density function (PDF) of power', fontsize=14)
+    plt.legend(fontsize=14, ncol = 1)
+    #plt.legend(bbox_to_anchor=(1.0, 0.7), fontsize=14, ncol = 1)
+    
+    if xlim or ylim:
+        filename = 'Power_PDF_{}_Bounded.png'.format(group_identifier)
+    else:
+        filename = 'Power_PDF_{}_Unbounded.png'.format(group_identifier)
+    filedir = os.path.join(plot_loc, 'Instantaneous', 'Power')
+    os.system('mkdir -p %s'%filedir)
+    plt.savefig(os.path.join(filedir, filename), bbox_inches='tight')
+    plt.close()
+    
     
 # In[]
 def plot_power_inst_pdf (pickle_file_name, plot_loc, case_name, dt, num_bins = 20, bounds_for_power = None, bounds_for_pdf = None):
@@ -149,6 +184,39 @@ def plot_power_spectra_combined (pickle_file_name, plot_loc, case_name, xlim = N
     plt.savefig(os.path.join(filedir, filename), bbox_inches='tight')
     plt.close()
 
+
+# In[]
+def plot_power_spectra_all_cases (pickle_file_name, plot_loc, case_colors, case_names, group_identifier, xlim = None, ylim = None):
+    # In[] Read the pickle data
+    with open(pickle_file_name, 'rb') as pickle_file_handle:
+        pickled_data_read = pickle.load(pickle_file_handle)
+     
+    plt.figure()
+    
+    for case_name  in case_names:
+        plt.loglog(pickled_data_read[case_name]['freq'], pickled_data_read[case_name]['psd'], color = case_colors[case_name], label=case_name)
+    
+    plt.xlabel('Frequency [Hz]')
+    plt.ylabel('PSD [MW^2/Hz]')
+    if xlim:
+        plt.xlim([xlim[0],xlim[1]])
+    if ylim:
+        plt.ylim([ylim[0],ylim[1]])
+    plt.tick_params(axis='x', labelsize=14)
+    plt.tick_params(axis='y', labelsize=14)
+    plt.title('Power spectral density of turbine power', fontsize=14)
+    plt.legend(fontsize=14, ncol = 1)
+    #plt.legend(bbox_to_anchor=(1.0, 0.7), fontsize=14, ncol = 1)
+    
+    if xlim or ylim:
+        filename = 'Power_PSD_{}_Bounded.png'.format(group_identifier)
+    else:
+        filename = 'Power_PSD_{}_Unbounded.png'.format(group_identifier)
+    filedir = os.path.join(plot_loc, 'Instantaneous', 'Power')
+    os.system('mkdir -p %s'%filedir)
+    plt.savefig(os.path.join(filedir, filename), bbox_inches='tight')
+    plt.close()
+
 # In[]
 def plot_power_avg (pickle_file_name, plot_loc, case_name, ylim=None):
     # In[] Read the pickle data
@@ -204,6 +272,86 @@ def plot_power_stdev_combined (pickle_file_name, plot_loc, case_name, ylim=None)
     else:
         filename = 'Power_StDev_{}_Unbounded.png'.format(case_name)
     filedir = os.path.join(plot_loc, 'TimeAvg', 'Power_Avg')
+    os.system('mkdir -p %s'%filedir)
+    plt.savefig(os.path.join(filedir, filename), bbox_inches='tight')
+    plt.close()
+    
+# In[]
+def plot_power_avg_all_cases (pickle_file_name, plot_loc, ylim=None):
+    # In[] Read the pickle data
+    with open(pickle_file_name, 'rb') as pickle_file_handle:
+        pickled_data_read = pickle.load(pickle_file_handle)
+        
+    case_names = list(pickled_data_read.keys())
+    power_avg = pickled_data_read[case_names[0]]['power_avg']
+    intervals = np.array(range(len(power_avg))) + 1
+    
+    power_avg_all_cases = {}
+    
+    for case_name in case_names:
+        power_avg_all_cases[case_name] = pickled_data_read[case_name]['power_avg'].flatten()/1.0e6
+    
+    df = pd.DataFrame(power_avg_all_cases, index = intervals)
+    
+    plt.figure()
+    ax = df.plot.bar(rot=0)
+
+    ax.set_xlabel('Interval', fontsize=14)
+    ax.set_ylabel('10-min averaged power [MW]', fontsize=14)
+    if ylim:
+        ax.set_ylim([ylim[0],ylim[1]])
+
+    #ax.set_xticks(intervals)
+    ax.tick_params(axis='x', labelsize=14)
+    ax.tick_params(axis='y', labelsize=14)
+    #plt.title('Average power over 10-min', fontsize=14)
+    ax.legend(bbox_to_anchor=(1.0, 0.7), fontsize=14, ncol = 1)
+    
+    if ylim:
+        filename = 'Power_TimeAvg_{}_Bounded.png'.format(case_name)
+    else:
+        filename = 'Power_TimeAvg_{}_Unbounded.png'.format(case_name)
+    filedir = os.path.join(plot_loc, 'TimeAvg', 'Power_Avg')
+    os.system('mkdir -p %s'%filedir)
+    plt.savefig(os.path.join(filedir, filename), bbox_inches='tight')
+    plt.close()
+    
+# In[]
+def plot_power_stdev_all_cases (pickle_file_name, plot_loc, ylim=None):
+    # In[] Read the pickle data
+    with open(pickle_file_name, 'rb') as pickle_file_handle:
+        pickled_data_read = pickle.load(pickle_file_handle)
+        
+    case_names = list(pickled_data_read.keys())
+    power_stdev = pickled_data_read[case_names[0]]['power_stdev']
+    intervals = np.array(range(len(power_stdev))) + 1
+    
+    power_stdev_all_cases = {}
+    
+    for case_name in case_names:
+        power_stdev_all_cases[case_name] = pickled_data_read[case_name]['power_stdev'].flatten()/1.0e6
+    
+    df = pd.DataFrame(power_stdev_all_cases, index = intervals)
+    
+    plt.figure()
+    ax = df.plot.bar(rot=0)
+
+    ax.set_xlabel('Interval', fontsize=14)
+    ax.set_ylabel('Std. dev. in power for 10-min interval [MW]', fontsize=14)
+    if ylim:
+        ax.set_ylim([ylim[0],ylim[1]])
+
+    #ax.set_xticks(intervals)
+    ax.tick_params(axis='x', labelsize=14)
+    ax.tick_params(axis='y', labelsize=14)
+    #plt.title('Average power over 10-min', fontsize=14)
+    ax.legend(bbox_to_anchor=(1.0, 0.7), fontsize=14, ncol = 1)
+    
+    if ylim:
+        filename = 'Power_StDev_{}_Bounded.png'.format(case_name)
+    else:
+        filename = 'Power_StDev_{}_Unbounded.png'.format(case_name)
+    filedir = os.path.join(plot_loc, 'TimeAvg', 'Power_StDev')
     os.system('mkdir -p %s'%filedir)
     plt.savefig(os.path.join(filedir, filename), bbox_inches='tight')
     plt.close()
