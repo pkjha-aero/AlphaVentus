@@ -3,9 +3,12 @@
 
 # In[]:
 # Import Modules
-from data_processing import *
-from combine_data import *
-from plotting import *
+from data_processing_base import *
+from data_processing_power import *
+from data_processing_slice import *
+from plotting_power import *
+from plotting_slice import *
+from plotting_line  import *
 
 # In[]
 import os
@@ -105,7 +108,7 @@ compute_power_pdf = True
 
 
 # In[]:
-case_name = 'MesoMicro1_CPM'
+case_name = 'MesoMicro1_NO_CPM'
 
 # Path where processed data for intervals and combined data are located
 processed_slice_base_loc = '/Users/jha3/Downloads/AlphaVentus_Slice'

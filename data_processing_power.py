@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
+Created on Sun Apr  2 19:14:28 2023
+
 @author: jha3
 """
+
 # In[]
 import os
 import numpy as np
@@ -10,6 +13,27 @@ from matplotlib import pyplot as plt
 from matplotlib import gridspec
 import json
 from datetime import date, datetime, timedelta, time
+
+# In[]
+from data_processing_base import *
+
+# In[]
+def get_power_data(nc_data):   
+    power_ts = np.array(nc_data['POWERTS'])
+    power_avg = np.array(nc_data['POWERTS'].mean(dim = 'Time'))
+    
+    return power_ts, power_avg
+
+
+# In[]
+def create_power_data (nc_data, start_time):
+    pickled_data = create_base_data(nc_data, start_time)
+    
+    # Pickled power data
+    pickled_data['power_inst'], pickled_data['power_avg'] = get_power_data(nc_data)
+    
+    return pickled_data
+
 
 # In[]:
 def combine_power_for_intervals_of_case(pickled_data_combined, pickled_data_for_interval, compute_power_stdev):

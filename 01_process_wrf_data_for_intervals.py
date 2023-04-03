@@ -3,8 +3,12 @@
 
 # In[]:
 # Import Modules
-from data_processing import *
-from plotting import *
+from data_processing_base import *
+from data_processing_power import *
+from data_processing_slice import *
+from plotting_power import *
+from plotting_slice import *
+from plotting_line  import *
 
 # In[]
 import os
