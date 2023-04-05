@@ -98,7 +98,7 @@ plot_slice_combined_intervals = True
 
 # In[]
 combine_power_for_intervals = True
-scale_power_for_intervals = False
+scale_power_for_intervals = True
 plot_power_combined_intervals = True
 
 compute_power_stdev = True
@@ -162,7 +162,7 @@ for interval, tsout_file_stamp in interval_tsoutfile_map.items():
             
         # Scale power data if desired
         if scale_power_for_intervals:
-            pickled_power_data_interval = pickled_power_data_interval
+            pickled_power_data_interval = scale_power(pickled_power_data_interval, 4.0)
     
         # Combine the picked data for intervals
         combined_power_data = combine_power_for_intervals_of_case(combined_power_data, pickled_power_data_interval, compute_power_stdev)
@@ -190,12 +190,12 @@ if plot_power_combined_intervals:
     plot_power_pdf(combined_power_pickle_file, combined_power_data_loc, case_name, 30, [2, 8], [0, 0.5])
     '''
     plot_power_inst_pdf (combined_power_pickle_file, combined_power_data_loc, case_name, dt, 30)
-    plot_power_inst_pdf (combined_power_pickle_file, combined_power_data_loc, case_name, dt, 30, [2, 8], [0, 7.0])
-    plot_power_inst_pdf (combined_power_pickle_file, combined_power_data_loc, case_name, dt, 30, [2, 8], None)
-    plot_power_inst_pdf (combined_power_pickle_file, combined_power_data_loc, case_name, dt, 30, None, [0, 7.0])
+    plot_power_inst_pdf (combined_power_pickle_file, combined_power_data_loc, case_name, dt, 30, [2.5, 5.5], [0, 20.0])
+    plot_power_inst_pdf (combined_power_pickle_file, combined_power_data_loc, case_name, dt, 30, [2.5, 5.5], None)
+    plot_power_inst_pdf (combined_power_pickle_file, combined_power_data_loc, case_name, dt, 30, None, [0, 20.0])
     
     plot_power_avg(combined_power_pickle_file, combined_power_data_loc, case_name)
-    plot_power_avg(combined_power_pickle_file, combined_power_data_loc, case_name, [3.5, 5.5])
+    plot_power_avg(combined_power_pickle_file, combined_power_data_loc, case_name, [3.5, 5.0])
     
     if compute_power_stdev and plot_power_stdev:
         plot_power_stdev_combined(combined_power_pickle_file, combined_power_data_loc, case_name)

@@ -36,6 +36,23 @@ def create_power_data (nc_data, start_time):
     return pickled_data
 
 
+# In[]
+def scale_power (pickled_power_data_interval, surplus_threshold = 4.0):
+    power_avg_key = 'power_avg'
+    power_inst_key = 'power_inst'
+    pickled_power_data_interval_scaled = {}
+    
+    surplus = pickled_power_data_interval[power_inst_key]/1.0e6 - surplus_threshold
+    surplus[np.where(surplus < 0)] = 0.0
+    surplus_normalized = surplus/surplus.max()
+    
+    reduction = surplus*surplus_normalized
+    
+    pickled_power_data_interval_scaled[power_inst_key] = pickled_power_data_interval[power_inst_key] - reduction*1.0e6
+    pickled_power_data_interval_scaled[power_avg_key] = pickled_power_data_interval_scaled[power_inst_key].mean()
+    
+    return pickled_power_data_interval_scaled
+
 # In[]:
 def combine_power_for_intervals_of_case(pickled_data_combined, pickled_data_for_interval, compute_power_stdev):
     power_avg_key = 'power_avg'

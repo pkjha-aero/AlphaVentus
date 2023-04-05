@@ -136,7 +136,7 @@ if combine_power_for_cases:
 # In[]
 if plot_power_for_cases:
     plot_power_avg_all_cases(combined_power_pickle_file, combined_power_data_loc)
-    plot_power_avg_all_cases(combined_power_pickle_file, combined_power_data_loc, [3.5, 5.5])
+    plot_power_avg_all_cases(combined_power_pickle_file, combined_power_data_loc, [3.5, 5.0])
     
     plot_power_stdev_all_cases(combined_power_pickle_file, combined_power_data_loc)
     
