@@ -277,7 +277,7 @@ def plot_power_stdev_combined (pickle_file_name, plot_loc, case_name, ylim=None)
     plt.close()
     
 # In[]
-def plot_power_avg_all_cases (pickle_file_name, plot_loc, ylim=None):
+def plot_power_avg_all_cases (pickle_file_name, plot_loc, case_colors, group_identifier, ylim=None):
     # In[] Read the pickle data
     with open(pickle_file_name, 'rb') as pickle_file_handle:
         pickled_data_read = pickle.load(pickle_file_handle)
@@ -294,7 +294,7 @@ def plot_power_avg_all_cases (pickle_file_name, plot_loc, ylim=None):
     df = pd.DataFrame(power_avg_all_cases, index = intervals)
     
     plt.figure()
-    ax = df.plot.bar(rot=0)
+    ax = df.plot.bar(rot=0, color = case_colors)
 
     ax.set_xlabel('Interval', fontsize=14)
     ax.set_ylabel('10-min averaged power [MW]', fontsize=14)
@@ -308,16 +308,16 @@ def plot_power_avg_all_cases (pickle_file_name, plot_loc, ylim=None):
     ax.legend(bbox_to_anchor=(1.0, 0.7), fontsize=14, ncol = 1)
     
     if ylim:
-        filename = 'Power_TimeAvg_{}_Bounded.png'.format(case_name)
+        filename = 'Power_TimeAvg_{}_Bounded.png'.format(group_identifier)
     else:
-        filename = 'Power_TimeAvg_{}_Unbounded.png'.format(case_name)
+        filename = 'Power_TimeAvg_{}_Unbounded.png'.format(group_identifier)
     filedir = os.path.join(plot_loc, 'TimeAvg', 'Power_Avg')
     os.system('mkdir -p %s'%filedir)
     plt.savefig(os.path.join(filedir, filename), bbox_inches='tight')
     plt.close()
     
 # In[]
-def plot_power_stdev_all_cases (pickle_file_name, plot_loc, ylim=None):
+def plot_power_stdev_all_cases (pickle_file_name, plot_loc, case_colors, group_identifier, ylim=None):
     # In[] Read the pickle data
     with open(pickle_file_name, 'rb') as pickle_file_handle:
         pickled_data_read = pickle.load(pickle_file_handle)
@@ -334,7 +334,7 @@ def plot_power_stdev_all_cases (pickle_file_name, plot_loc, ylim=None):
     df = pd.DataFrame(power_stdev_all_cases, index = intervals)
     
     plt.figure()
-    ax = df.plot.bar(rot=0)
+    ax = df.plot.bar(rot=0, color = case_colors)
 
     ax.set_xlabel('Interval', fontsize=14)
     ax.set_ylabel('Std. dev. in power for 10-min interval [MW]', fontsize=14)
@@ -348,9 +348,9 @@ def plot_power_stdev_all_cases (pickle_file_name, plot_loc, ylim=None):
     ax.legend(bbox_to_anchor=(1.0, 0.7), fontsize=14, ncol = 1)
     
     if ylim:
-        filename = 'Power_StDev_{}_Bounded.png'.format(case_name)
+        filename = 'Power_StDev_{}_Bounded.png'.format(group_identifier)
     else:
-        filename = 'Power_StDev_{}_Unbounded.png'.format(case_name)
+        filename = 'Power_StDev_{}_Unbounded.png'.format(group_identifier)
     filedir = os.path.join(plot_loc, 'TimeAvg', 'Power_StDev')
     os.system('mkdir -p %s'%filedir)
     plt.savefig(os.path.join(filedir, filename), bbox_inches='tight')

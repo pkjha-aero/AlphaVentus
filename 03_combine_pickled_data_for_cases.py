@@ -135,10 +135,10 @@ if combine_power_for_cases:
         pickle.dump(combined_power_data_all_cases, combined_power_pickle_file_handle)
 # In[]
 if plot_power_for_cases:
-    plot_power_avg_all_cases(combined_power_pickle_file, combined_power_data_loc)
-    plot_power_avg_all_cases(combined_power_pickle_file, combined_power_data_loc, [3.5, 5.0])
+    plot_power_avg_all_cases(combined_power_pickle_file, combined_power_data_loc, case_colors, 'All')
+    plot_power_avg_all_cases(combined_power_pickle_file, combined_power_data_loc, case_colors, 'All', [3.9, 4.6])
     
-    plot_power_stdev_all_cases(combined_power_pickle_file, combined_power_data_loc)
+    plot_power_stdev_all_cases(combined_power_pickle_file, combined_power_data_loc, case_colors, 'All')
     
     plot_power_pdf_all_cases(combined_power_pickle_file, combined_power_data_loc, case_colors, case_names, 'All')
     plot_power_pdf_all_cases(combined_power_pickle_file, combined_power_data_loc, case_colors, ['MesoMicro1_CPM', 'MesoMicro2_CPM'], 'CPM')
