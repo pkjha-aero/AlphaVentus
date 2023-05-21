@@ -99,11 +99,14 @@ frac_time = 0.04 # Fraction of time series to use
 #frac_time = 1.00 # Fraction of time series to use
 
 # In[]
-# Flags etc.
+# Flags for slice
 extract_slice_data = True
-extract_power_data = False
 plot_slice_data = True
-plot_power_data = False
+
+# In[]
+# Flags for power
+extract_power_data = False
+plot_power_data = false
 
 # In[]:
 case_name = 'MesoMicro1_CPM'
