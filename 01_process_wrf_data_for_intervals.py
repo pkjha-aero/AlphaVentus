@@ -106,7 +106,7 @@ plot_slice_data = True
 # In[]
 # Flags for power
 extract_power_data = False
-plot_power_data = false
+plot_power_data = False
 
 # In[]:
 case_name = 'MesoMicro1_CPM'
