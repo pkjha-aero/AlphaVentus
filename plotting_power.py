@@ -82,7 +82,7 @@ def plot_power_pdf_all_cases (pickle_file_name, plot_loc, case_colors, case_name
      
     plt.figure()
     
-    colors = ['r', 'b', 'g', 'm']
+    #colors = case_colors.values()
     for case_name  in case_names:
         plt.plot(pickled_data_read[case_name]['bin_centers'], pickled_data_read[case_name]['hist'], color = case_colors[case_name], label=case_name)
     
@@ -129,7 +129,7 @@ def plot_power_inst_pdf (pickle_file_name, plot_loc, case_name, dt, num_bins = 2
     ax[0].tick_params(axis='y', labelsize=14)
     
     # In[]: PDF
-    ax[1].barh(pickled_data_read['bin_centers'], pickled_data_read['hist'], color = 'lime')
+    #ax[1].barh(pickled_data_read['bin_centers'], pickled_data_read['hist'], color = 'lime')
     ax[1].plot(pickled_data_read['hist'], pickled_data_read['bin_centers'], color = 'k')
 
     ax[1].set_xlabel('PDF of power[1/MW]', fontsize=14)
