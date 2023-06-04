@@ -16,6 +16,39 @@ from datetime import date, datetime, timedelta, time
 import pickle
 
 
+def plot_contour_slice(slice_data, DX, DY, plot_loc, image_name, qoi, var_label, var_unit, \
+                        case_legend, cont_levels_count, qoi_cont_range = None, xlim = None, ylim = None):
+    cmap_name = 'hot'
+    
+    if qoi_cont_range:
+        cont_levels = np.linspace(qoi_cont_range[0], qoi_cont_range[1], cont_levels_count)
+    else:
+        cont_levels = cont_levels_count
+
+    ny, nx = slice_data.shape
+
+    plt.figure(figsize=(9, 6))
+    x_ind, y_ind = np.meshgrid(range(nx), range(ny))
+    cont = plt.contourf(x_ind*DX, y_ind*DY, slice_data, levels = cont_levels, cmap=cmap_name, extend='both')
+    clb = plt.colorbar(cont)
+    clb.ax.tick_params(labelsize=14)
+    plt.xlabel(f"%s [m]"%'x', fontsize=16)
+    plt.ylabel(f"%s [m]"%'y', fontsize=16)
+    #ax.set_xticks([])
+    #ax.set_yticks([])
+    plt.tick_params(axis='x', labelsize=16)
+    plt.tick_params(axis='y', labelsize=16)
+
+    if xlim:
+        plt.xlim([xlim[0],xlim[1]])
+    if ylim:
+        plt.ylim([ylim[0],ylim[1]])
+    plt.title('{} [{}], {}'.format(var_label, var_unit, case_legend),fontsize=16)
+
+    plt.show()
+    plt.savefig(os.path.join(plot_loc, image_name), bbox_inches='tight')
+    #plt.close()
+
 # In[]
 def plot_contours_instantaneous(pickle_file_name, plot_loc, qoi_plot_map, qoi_range_map, xlim=None, ylim=None):
     # In[] Read the pickle data

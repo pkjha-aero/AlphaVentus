@@ -13,6 +13,25 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
 # In[]:
+def compute_indices_weights_for_slices (case_dir_map, hub_height):
+    for case in case_dir_map.keys():
+        dz = case_dir_map[case]['dz']
+
+        z_ind1 = hub_height // int(dz)
+        z_ind2 = z_ind1 + 1
+        z1 = int(dz*z_ind1)
+        z2 = int(dz*z_ind2)
+        w1 = 1.0 - (hub_height - z1)/dz
+        w2 = 1.0 - (z2 - hub_height)/dz
+        print('z_indices: [{}, {}], z: [{}, {}], weights: [{}, {}]'.format(
+            z_ind1, z_ind2, z1, z2, w1, w2))
+
+        case_dir_map[case]['z_indices'] = [z_ind1, z_ind2]
+        case_dir_map[case]['weights'] = [w1, w2]
+    
+    return case_dir_map
+
+# In[]:
 def prepare_NREL_data (WRF_result_base_loc, vhub):
     NREL_Data = pd.read_csv(os.path.join(WRF_result_base_loc,'NREL_5MW_126_RWT.csv'))
     ws_NREL    = list(NREL_Data['Wind Speed [m/s]'])
@@ -127,11 +146,13 @@ def plot_power_curve_for_cases (NREL_Data, vhub, case_keys, case_dir_map, plt_ti
     plt.xlabel(r'Hub-height wind speed [m s$^{-1}$]',fontsize=12)
     plt.ylabel(r'Power (MW)',fontsize=12)
     plt.legend(loc='best')
-    plt.gca().tick_params(labelsize=12)
-    plt.show()
-
+    plt.tick_params(axis = 'x', labelsize=12)
+    plt.tick_params(axis = 'y', labelsize=12)
+    
     if savefig:
-        plt.savefig(figFileName,dpi=300)
+        plt.savefig(figFileName, bbox_inches='tight')
+        
+    plt.show()
         
 # In[]:
 def plot_power_curve_error_for_cases (vhub, case_keys, case_dir_map, plt_title):
@@ -168,6 +189,7 @@ def read_wrfout_data_for_case_ws (WRF_result_base_loc, case, ws, outfile):
 def read_tsout_data_for_case_ws (WRF_result_base_loc, case, ws, tsoutfile):
     case_loc = path.join(WRF_result_base_loc, case)
     case_ws_loc = path.join(case_loc, 'power_curve_{}'.format(ws))
+    print('case/wind_speed loc: {}'.format(case_ws_loc))
     
     case_ws_tsoutfile = path.join(case_ws_loc, tsoutfile)
     case_ws_ts_data = xr.open_dataset(case_ws_tsoutfile)

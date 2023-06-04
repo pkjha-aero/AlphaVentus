@@ -19,7 +19,7 @@ from datetime import date, datetime, timedelta, time
 # In[]
 from data_processing_base import *
 
-# In[]
+# In[]:
 def extract_slices_from_tsout_file (tsout_data, qoi, z_ind, time_ind = None):
     if time_ind:
         slice_data = np.array(tsout_data[qoi].isel(Time = time_ind).isel(bottom_top = z_ind))
@@ -27,6 +27,11 @@ def extract_slices_from_tsout_file (tsout_data, qoi, z_ind, time_ind = None):
         slice_data = np.array(tsout_data[qoi].isel(bottom_top = z_ind))
         
     return slice_data
+
+# In[]:
+def compute_u_mag_for_slice (slice_data_U, slice_data_V):
+    slice_data_umag = np.sqrt(np.square(slice_data_U) + np.square(slice_data_V))
+    return slice_data_umag
 
 # In[]
 def get_z_slices_instantaneous(nc_data, qoi_from_tsout_file, z_plane_locs, ref_time, dt, start_time, frac_time):
