@@ -4,7 +4,7 @@
 import sys
 import os
 import os.path as path
-
+import xarray as xr
 from netCDF4 import Dataset
 import numpy as np
 import pandas as pd
@@ -153,3 +153,23 @@ def plot_power_curve_error_for_cases (vhub, case_keys, case_dir_map, plt_title):
 
     plt.show()
     
+    
+# In[]:
+def read_wrfout_data_for_case_ws (WRF_result_base_loc, case, ws, outfile):
+    case_loc = os.path.join(WRF_result_base_loc, case)
+    case_ws_loc = os.path.join(case_loc, 'power_curve_{}'.format(ws))
+    
+    case_ws_outfile = path.join(case_ws_loc, outfile)
+    case_ws_wrf_data = xr.open_dataset(case_ws_outfile)
+    
+    return case_ws_wrf_data
+
+# In[]:
+def read_tsout_data_for_case_ws (WRF_result_base_loc, case, ws, tsoutfile):
+    case_loc = path.join(WRF_result_base_loc, case)
+    case_ws_loc = path.join(case_loc, 'power_curve_{}'.format(ws))
+    
+    case_ws_tsoutfile = path.join(case_ws_loc, tsoutfile)
+    case_ws_ts_data = xr.open_dataset(case_ws_tsoutfile)
+    
+    return case_ws_ts_data

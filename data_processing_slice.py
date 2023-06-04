@@ -8,6 +8,8 @@ Created on Sun Apr  2 19:14:28 2023
 
 # In[]
 import os
+import os.path as path
+import xarray as xr
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib import gridspec
@@ -16,6 +18,15 @@ from datetime import date, datetime, timedelta, time
 
 # In[]
 from data_processing_base import *
+
+# In[]
+def extract_slices_from_tsout_file (tsout_data, qoi, z_ind, time_ind = None):
+    if time_ind:
+        slice_data = np.array(tsout_data[qoi].isel(Time = time_ind).isel(bottom_top = z_ind))
+    else:
+        slice_data = np.array(tsout_data[qoi].isel(bottom_top = z_ind))
+        
+    return slice_data
 
 # In[]
 def get_z_slices_instantaneous(nc_data, qoi_from_tsout_file, z_plane_locs, ref_time, dt, start_time, frac_time):
