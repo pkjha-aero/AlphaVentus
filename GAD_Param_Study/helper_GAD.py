@@ -13,6 +13,10 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
 # In[]:
+sys.path.insert(0, os.path.dirname(os.getcwd()))
+from data_processing_slice import *
+
+# In[]:
 def compute_indices_weights_for_slices (case_dir_map, hub_height):
     for case in case_dir_map.keys():
         dz = case_dir_map[case]['dz']
@@ -195,3 +199,24 @@ def read_tsout_data_for_case_ws (WRF_result_base_loc, case, ws, tsoutfile):
     case_ws_ts_data = xr.open_dataset(case_ws_tsoutfile)
     
     return case_ws_ts_data
+
+# In[]:
+def get_hub_height_slice_data_case_ws (WRF_result_base_loc, case, ws, outfile, tsoutfile, \
+                                      time_ind, z_ind1, z_ind2, w1, w2):
+    case_ws_wrf_data = read_wrfout_data_for_case_ws (WRF_result_base_loc, case, ws, outfile)
+    case_ws_ts_data = read_tsout_data_for_case_ws (WRF_result_base_loc, case, ws, tsoutfile)
+    DX, DY = case_ws_wrf_data.DX, case_ws_wrf_data.DY
+    #print('DX: {}, DY: {}, DZ: {}'.format(DX, DY, DZ))
+
+    slice_data1_U = extract_slices_from_tsout_file (case_ws_ts_data, 'UTS', z_ind1, time_ind)
+    slice_data1_V = extract_slices_from_tsout_file (case_ws_ts_data, 'VTS', z_ind1, time_ind)
+    slice_data1_UMAG = compute_u_mag_for_slice (slice_data1_U, slice_data1_V)
+
+    slice_data2_U = extract_slices_from_tsout_file (case_ws_ts_data, 'UTS', z_ind2, time_ind)
+    slice_data2_V = extract_slices_from_tsout_file (case_ws_ts_data, 'VTS', z_ind2, time_ind)
+    slice_data2_UMAG = compute_u_mag_for_slice (slice_data2_U, slice_data2_V)
+
+    slice_data_wgt_UMAG = w1*slice_data1_UMAG + w2*slice_data2_UMAG
+    
+    return slice_data_wgt_UMAG, DX, DY
+    
