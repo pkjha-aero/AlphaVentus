@@ -15,6 +15,7 @@ import matplotlib.dates as mdates
 # In[]:
 sys.path.insert(0, os.path.dirname(os.getcwd()))
 from data_processing_slice import *
+from plotting_slice import *
 
 # In[]:
 def compute_indices_weights_for_slices (case_dir_map, hub_height):
@@ -193,7 +194,7 @@ def read_wrfout_data_for_case_ws (WRF_result_base_loc, case, ws, outfile):
 def read_tsout_data_for_case_ws (WRF_result_base_loc, case, ws, tsoutfile):
     case_loc = path.join(WRF_result_base_loc, case)
     case_ws_loc = path.join(case_loc, 'power_curve_{}'.format(ws))
-    print('case/wind_speed loc: {}'.format(case_ws_loc))
+    #print('case/wind_speed loc: {}'.format(case_ws_loc))
     
     case_ws_tsoutfile = path.join(case_ws_loc, tsoutfile)
     case_ws_ts_data = xr.open_dataset(case_ws_tsoutfile)
@@ -220,3 +221,41 @@ def get_hub_height_slice_data_case_ws (WRF_result_base_loc, case, ws, outfile, t
     
     return slice_data_wgt_UMAG, DX, DY
     
+    
+# In[]:
+def get_hub_height_slice_data_in_case_data_map (case_dir_map, WRF_result_base_loc, ws, \
+                                                outfile, tsoutfile, time_ind):
+    for case in case_dir_map.keys():
+        z_ind1 = case_dir_map[case]['z_indices'][0]
+        z_ind2 = case_dir_map[case]['z_indices'][1]
+        w1 = case_dir_map[case]['weights'][0]
+        w2 = case_dir_map[case]['weights'][1]
+        #print('z_indices: [{}, {}], weights: [{}, {}]'.format(z_ind1, z_ind2, w1, w2))
+
+        slice_data_wgt_UMAG, DX, DY = \
+        get_hub_height_slice_data_case_ws (WRF_result_base_loc, case, ws, outfile, tsoutfile, \
+                                      time_ind, z_ind1, z_ind2, w1, w2)
+        
+        case_dir_map[case]['slice_data'] = slice_data_wgt_UMAG
+        case_dir_map[case]['DX'] = DX
+        case_dir_map[case]['DY'] = DY
+        
+    return case_dir_map
+
+# In[]:
+def plot_hub_height_slice_data_all_cases_separately (case_dir_map, GAD_param_slice_loc, ws, \
+                                                     cont_levels_count, qoi_cont_range, xlim, ylim):
+    for case in case_dir_map.keys():
+        case_legend = case_dir_map[case]['legend']
+
+        slice_data_wgt_UMAG = case_dir_map[case]['slice_data']
+        DX = case_dir_map[case]['DX']
+        DY = case_dir_map[case]['DY']
+
+        plot_loc = os.path.join(GAD_param_slice_loc, case, 'power_curve_{}'.format(ws))
+        os.system('mkdir -p %s'%plot_loc)
+        image_name = 'slice_{}.png'.format('UMAG')
+
+        plot_contour_slice(slice_data_wgt_UMAG, DX, DY, plot_loc, image_name, \
+                            'UMAG', 'UMAG', 'm/s', case_legend, \
+                            cont_levels_count, qoi_cont_range, xlim, ylim)
