@@ -140,8 +140,8 @@ def plot_power_curve_for_cases (NREL_Data, vhub, case_keys, case_dir_map, plt_ti
         line_style = case_dir_map[case]['line_style']
         plt.plot(vhub, power_case_ws*1e-6/pr, line_style, label=legend)
     plt.title(plt_title,fontsize=12)
-    plt.xlim(2,16)
-    plt.xticks(np.arange(2,16,2))
+    plt.xlim(2.9,15.1)
+    plt.xticks(np.arange(3,15,1.5))
     plt.ylim(0,7.0)
     plt.xlabel(r'Hub-height wind speed [m s$^{-1}$]',fontsize=12)
     plt.ylabel(r'Power (MW)',fontsize=12)
@@ -165,8 +165,8 @@ def plot_power_curve_error_for_cases (vhub, case_keys, case_dir_map, plt_title):
         line_style = case_dir_map[case]['line_style']
         plt.plot(vhub, error_case_ws, line_style, label=legend)
     plt.title(plt_title,fontsize=12)
-    plt.xlim(2,16)
-    plt.xticks(np.arange(2,16,2))
+    plt.xlim(2.9,15.1)
+    plt.xticks(np.arange(3,15,1.5))
     plt.xlabel(r'Hub-height wind speed [m s$^{-1}$]',fontsize=12)
     plt.ylabel(r'Percent error w.r.t. NREL data',fontsize=12)
     plt.legend(loc='best')
