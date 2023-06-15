@@ -45,8 +45,9 @@ def plot_contour_slice(slice_data, DX, DY, plot_loc, image_name, qoi, var_label,
         plt.ylim([ylim[0],ylim[1]])
     plt.title('{} [{}], {}'.format(var_label, var_unit, case_legend),fontsize=16)
 
-    plt.show()
     plt.savefig(os.path.join(plot_loc, image_name), bbox_inches='tight')
+    plt.show()
+    
     #plt.close()
 
 # In[]

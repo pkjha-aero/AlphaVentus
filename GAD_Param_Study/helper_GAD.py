@@ -243,8 +243,9 @@ def get_hub_height_slice_data_in_case_data_map (case_dir_map, WRF_result_base_lo
     return case_dir_map
 
 # In[]:
-def plot_hub_height_slice_data_all_cases_separately (case_dir_map, GAD_param_slice_loc, ws, \
-                                                     cont_levels_count, qoi_cont_range, xlim, ylim):
+def plot_hub_height_slice_data_all_cases_separately (case_dir_map, GAD_param_slice_loc, slice_dir, \
+                                                     ws, cont_levels_count, qoi_cont_range, \
+                                                     xlim, ylim):
     for case in case_dir_map.keys():
         case_legend = case_dir_map[case]['legend']
 
@@ -252,9 +253,9 @@ def plot_hub_height_slice_data_all_cases_separately (case_dir_map, GAD_param_sli
         DX = case_dir_map[case]['DX']
         DY = case_dir_map[case]['DY']
 
-        plot_loc = os.path.join(GAD_param_slice_loc, case, 'power_curve_{}'.format(ws))
+        plot_loc = os.path.join(GAD_param_slice_loc, slice_dir, 'power_curve_{}'.format(ws))
         os.system('mkdir -p %s'%plot_loc)
-        image_name = 'slice_{}.png'.format('UMAG')
+        image_name = 'slice_{}_{}.png'.format(case, 'UMAG')
 
         plot_contour_slice(slice_data_wgt_UMAG, DX, DY, plot_loc, image_name, \
                             'UMAG', 'UMAG', 'm/s', case_legend, \
